@@ -13,6 +13,9 @@ class TorchPlus:
     
     all_tensors : Dict = field(default_factory=dict)
 
+    def compile_model_block(self,str):
+        raise "No implementation"
+
     def gen_all_params(self):
         self.all_params=[self.all_tensors[key] for key in self.all_tensors if self.all_tensors[key].requires_grad]
         return self.all_params
