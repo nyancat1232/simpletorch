@@ -18,10 +18,10 @@ class TorchPlus:
         optimizer = self.meta_optimizer(mo_instance.parameters(), lr=1e-3)
 
         
-        return TorchPlusInstance(loss=loss_fn,model=mo_instance,optimizer=optimizer)
+        return TorchPlusMetaInstance(loss=loss_fn,model=mo_instance,optimizer=optimizer)
     
 @dataclass
-class TorchPlusInstance:
+class TorchPlusMetaInstance:
     loss : Any
     model: Any
     optimizer: Any
