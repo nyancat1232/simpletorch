@@ -13,9 +13,9 @@ class TorchPlus:
     model_input_labels : Any = None
 
     def init_metas(self):
-        loss_fn = self.error_measurement()
+        loss_fn = self.meta_error_measurement()
         mo_instance = self.model()
-        optimizer = self.optimizer(mo_instance.parameters(), lr=1e-3)
+        optimizer = self.meta_optimizer(mo_instance.parameters(), lr=1e-3)
 
         
         return TorchPlusInstance(loss=loss_fn,model=mo_instance,optimizer=optimizer)
