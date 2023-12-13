@@ -1,7 +1,7 @@
 import torch
 from dataclasses import dataclass,field
 
-from typing import Any,List
+from typing import Any,List,Dict
 #https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
 @dataclass
 class TorchPlus:
@@ -10,24 +10,18 @@ class TorchPlus:
     meta_optimizer_epoch : int = 2000
     meta_error_measurement : Any = None
     meta_activator : Any = None
-    constatns : Any
-    parameters : List[Any] = None
-    reflect_predictions : Any
-    reflect_labels : Any
+    
+    all_tensors : Dict = field(default_factory=dict)
 
-    def calc(self):
-        loss_fn = self.meta_error_measurement()
-        optimizer = self.meta_optimizer(self.model_parameters, lr=self.meta_optimizer_learning_rate)
-        for t in range(self.meta_optimizer_epoch):
-            # Forward pass: Compute predicted y by passing x to the model
-            y_pred = model(x)
-
-            # Compute and print loss
-            loss = loss_fn(y_pred, y)
-            if t % 100 == 99:
-                print(t, loss.item())
-
-            # Zero gradients, perform a backward pass, and update the weights.
-            optimizer.zero_grad()
+    def gen_all_params(self):
+        self.all_params=[self.all_tensors[key] for key in self.all_tensors if self.all_tensors[key].requires_grad]
+        return self.all_params
+    
+    def train(self):
+        for _ in range(self.meta_optimizer_epoch):
+            loss = self.meta_error_measurement()(self.all_tensors['_lval'], self._rval)
+            optim = self.meta_optimizer(self.all_params,lr=0.1)
+            optim.zero_grad()
             loss.backward()
-            optimizer.step()
+            optim.step()
+        return self.all_params
