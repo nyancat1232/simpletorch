@@ -12,3 +12,6 @@ class TorchPlus:
     meta_activator : Any = None
     
     all_tensors : Dict = field(default_factory=dict)
+
+    def get_all_params(self):
+        return [self.all_tensors[key] for key in self.all_tensors if self.all_tensors[key].requires_grad]
