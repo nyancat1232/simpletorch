@@ -15,3 +15,9 @@ class TorchPlus:
 
     def get_all_params(self):
         return [self.all_tensors[key] for key in self.all_tensors if self.all_tensors[key].requires_grad]
+    def train_one_step_by_equation(self,label,prediction_quation):
+        loss = self.meta_error_measurement()(label,  prediction_quation)
+        optim = self.meta_optimizer(self.get_all_params(),lr=self.meta_optimizer_learning_rate)
+        optim.zero_grad()
+        loss.backward()
+        optim.step()
