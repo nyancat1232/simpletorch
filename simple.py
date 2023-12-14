@@ -11,7 +11,7 @@ class TorchPlus:
     meta_error_measurement : Any = None
     meta_activator : Any = None
     
-    all_leaf_tensors : Dict = field(default_factory=dict)
+    all_leaf_tensors : Dict[str,torch.Tensor] = field(default_factory=dict)
 
     assign_process_values : Callable = None
     assign_process_process : Callable = None
