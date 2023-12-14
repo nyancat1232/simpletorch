@@ -13,7 +13,7 @@ class TorchPlus:
     
     all_leaf_tensors : Dict[str,torch.Tensor] = field(default_factory=dict)
 
-    assign_process_values : Callable = None
+    assign_leaf_tensors : Callable = None
     assign_process_process : Callable = None
 
     def get_all_params(self):
@@ -26,7 +26,7 @@ class TorchPlus:
         optim.step()
     def train(self):
         #all terminals
-        self.assign_process_values(self)
+        self.assign_leaf_tensors(self)
         
         for _ in range(self.meta_optimizer_epoch):
             #process
