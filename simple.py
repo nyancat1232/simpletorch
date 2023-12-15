@@ -26,6 +26,12 @@ class TorchTensorPlus():
             self._tensor.requires_grad = True
         return self._tensor
     
+    def __getitem__(self,key):
+        if key >= 0:
+            return self._tensor[key]
+        else :
+            return self._tensor
+    
     
     
     
@@ -41,7 +47,7 @@ class TorchPlus:
     meta_activator : Any = None
     
     all_leaf_tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
-    sequence_axis : int = -1
+    is_sequence : bool = False
 
     assign_leaf_tensors : Callable = None
     assign_process_process : Callable = None
@@ -55,21 +61,41 @@ class TorchPlus:
         optim.zero_grad()
         loss.backward()
         optim.step()
+
+    
+    def gen_sequence_len(self) -> int:
+        if self.is_sequence:
+            for tensor in self.all_leaf_tensors:
+                if self.all_leaf_tensors[tensor].ttype == TTPType.INPUT:
+                    self._sequence_len = len(self.all_leaf_tensors[tensor].tensor)
+                    break
+        else:
+            raise "Not sequence"
     
     def train(self):
         #all terminals
         self.assign_leaf_tensors(self)
-        
-        for _ in range(self.meta_optimizer_epoch):
-            #process
-            self.assign_process_process(self)
 
-            #train
-            self.train_one_step_by_equation(self._label,self._pred)
+        for _ in range(self.meta_optimizer_epoch):
+            try:
+                self.gen_sequence_len()
+                for current_sequence in range(self._sequence_len):
+                    self.assign_process_process(self,current_sequence)
+                    self.train_one_step_by_equation(self._label,self._pred)
+            except:
+                self.assign_process_process(self,current_sequence=-1)
+                self.train_one_step_by_equation(self._label,self._pred)
+
         return self.get_all_params()
     
     def predict(self,**kwarg):
         for key in kwarg:
             self.all_leaf_tensors[key].tensor = kwarg[key]
-        self.assign_process_process(self)
+        
+        try:
+            self.gen_sequence_len()
+            for current_sequence in range(self._sequence_len):
+                self.assign_process_process(self,current_sequence)
+        except:
+            self.assign_process_process(self,current_sequence=-1)
         return self._pred
