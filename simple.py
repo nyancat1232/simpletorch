@@ -13,6 +13,7 @@ class TTPType(Enum):
 @dataclass
 class TorchTensorPlus():
     ttype : TTPType
+    sequence_axis : int = -1
     _tensor : torch.Tensor = field(repr=False,init=False)
 
     @property
