@@ -66,3 +66,8 @@ class TorchPlus:
             #train
             self.train_one_step_by_equation(self._label,self._pred)
         return self.get_all_params()
+    
+    def predict(self,**kwarg):
+        for key in kwarg:
+            self.all_leaf_tensors[key] = kwarg[key]
+        return self._pred
