@@ -69,5 +69,6 @@ class TorchPlus:
     
     def predict(self,**kwarg):
         for key in kwarg:
-            self.all_leaf_tensors[key] = kwarg[key]
+            self.all_leaf_tensors[key].tensor = kwarg[key]
+        self.assign_process_process(self)
         return self._pred
