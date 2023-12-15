@@ -75,6 +75,7 @@ class TorchPlus:
     def train(self):
         #all terminals
         self.assign_leaf_tensors(self)
+        self._current_activator = self.meta_activator()
 
         for _ in range(self.meta_optimizer_epoch):
             try:
