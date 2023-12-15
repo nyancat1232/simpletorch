@@ -13,7 +13,6 @@ class TTPType(Enum):
 @dataclass
 class TorchTensorPlus():
     ttype : TTPType
-    sequence_axis : int = -1
     _tensor : torch.Tensor = field(repr=False,init=False)
 
     @property
@@ -42,6 +41,7 @@ class TorchPlus:
     meta_activator : Any = None
     
     all_leaf_tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
+    sequence_axis : int = -1
 
     assign_leaf_tensors : Callable = None
     assign_process_process : Callable = None
