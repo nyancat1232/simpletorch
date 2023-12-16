@@ -29,9 +29,9 @@ class TorchTensorPlus():
         
     def __getitem__(self,key):
         if self.axis_sequence == 0:
-            return self._tensor[key,:]
+            return self._tensor[key]
         elif self.axis_sequence <0 :
-            return self._tensor.unsqueeze(0)[key]
+            return self._tensor.unsqueeze(0)
         else:
             raise "error"
     
@@ -43,9 +43,24 @@ class TorchTensorPlus():
         else:
             raise "error"
     
+
+@dataclass
+class AllTensorsToSequence:
+    tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
+
+    def get_all_tensors(self,key):
+        return {tensor_name: self.tensors[tensor_name][key]  for tensor_name in self.tensors}
+
+    def get_length(self):
+        for tensor_name in self.tensors:
+            return self.tensors[tensor_name].tensor.shape[0]
+        #return [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors]
+
+    def get_all_params(self):
+        return [self.tensors[key].tensor for key in self.tensors if self.tensors[key].ttype == TTPType.PARAMETER]
     
-    
-    
+
+
         
 
 #https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
@@ -57,47 +72,29 @@ class TorchPlus:
     meta_error_measurement : Any = torch.nn.MSELoss
     meta_activator : Any = None
     
-    all_leaf_tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
+    all_leaf_tensors : AllTensorsToSequence = field(default_factory=AllTensorsToSequence)
 
     assign_leaf_tensors : Callable = None
     assign_process_process : Callable = None
 
-    def get_all_params(self):
-        return [self.all_leaf_tensors[key].tensor for key in self.all_leaf_tensors if self.all_leaf_tensors[key].ttype == TTPType.PARAMETER]
-    
     def train_one_step_by_equation(self,label,prediction_quation):
         loss = self.meta_error_measurement()(label,  prediction_quation)
-        optim = self.meta_optimizer(self.get_all_params(),lr=self.meta_optimizer_learning_rate)
+        optim = self.meta_optimizer(self.all_leaf_tensors.get_all_params(),lr=self.meta_optimizer_learning_rate)
         optim.zero_grad()
         loss.backward()
         optim.step()
 
-    
-    def gen_sequence_len(self) -> int:
-        if self.is_sequence:
-            for tensor in self.all_leaf_tensors:
-                if self.all_leaf_tensors[tensor].ttype == TTPType.INPUT:
-                    self._sequence_len = len(self.all_leaf_tensors[tensor].tensor)
-                    break
-        else:
-            raise "Not sequence"
-    
     def train(self):
         #all terminals
         self.assign_leaf_tensors(self)
         self._current_activator = self.meta_activator()
 
         for _ in range(self.meta_optimizer_epoch):
-            try:
-                self.gen_sequence_len()
-                for current_sequence in range(self._sequence_len):
-                    self.assign_process_process(self,current_sequence)
-                    self.train_one_step_by_equation(self._label,self._pred)
-            except:
-                self.assign_process_process(self,current_sequence=-1)
-                self.train_one_step_by_equation(self._label,self._pred)
+            for sequence_ind in range(self.all_leaf_tensors.get_length()):
+                _label,_pred = self.assign_process_process(self.all_leaf_tensors.get_all_tensors(sequence_ind))
+                self.train_one_step_by_equation(_label,_pred)
 
-        return self.get_all_params()
+        return self.all_leaf_tensors.get_all_params()
     
     def predict(self,**kwarg):
         for key in kwarg:
