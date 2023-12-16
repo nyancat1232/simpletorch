@@ -13,6 +13,7 @@ class TTPType(Enum):
 @dataclass
 class TorchTensorPlus():
     ttype : TTPType
+    axis_sequence : int = -1
     _tensor : torch.Tensor = field(repr=False,init=False)
 
     @property
@@ -25,12 +26,22 @@ class TorchTensorPlus():
         if self.ttype==TTPType.PARAMETER:
             self._tensor.requires_grad = True
         return self._tensor
-    
+        
     def __getitem__(self,key):
-        if key >= 0:
-            return self._tensor[key]
-        else :
-            return self._tensor
+        if self.axis_sequence == 0:
+            return self._tensor[key,:]
+        elif self.axis_sequence <0 :
+            return self._tensor.unsqueeze(0)[key]
+        else:
+            raise "error"
+    
+    def __iter__(self):
+        if self.axis_sequence == 0:
+            return self._tensor.__iter__()
+        elif self.axis_sequence <0 :
+            return self._tensor.unsqueeze(0).__iter__()
+        else:
+            raise "error"
     
     
     
