@@ -58,7 +58,6 @@ class TorchPlus:
     meta_activator : Any = None
     
     all_leaf_tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
-    is_sequence : bool = False
 
     assign_leaf_tensors : Callable = None
     assign_process_process : Callable = None
