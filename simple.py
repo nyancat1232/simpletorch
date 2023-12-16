@@ -98,12 +98,10 @@ class TorchPlus:
     
     def predict(self,**kwarg):
         for key in kwarg:
-            self.all_leaf_tensors[key].tensor = kwarg[key]
+            self.all_leaf_tensors.tensors[key].tensor = kwarg[key]
         
-        try:
-            self.gen_sequence_len()
-            for current_sequence in range(self._sequence_len):
-                self.assign_process_process(self,current_sequence)
-        except:
-            self.assign_process_process(self,current_sequence=-1)
-        return self._pred
+        _pred=None
+        for sequence_ind in range(self.all_leaf_tensors.get_length()):
+            _pred = self.assign_process_process(self.all_leaf_tensors.get_all_tensors(sequence_ind))
+        
+        return _pred
