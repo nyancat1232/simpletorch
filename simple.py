@@ -125,7 +125,7 @@ class TorchPlus:
 
         for _ in range(self.meta_optimizer_epoch):
             for sequence_ind in range(self._all_leaf_tensors.get_length(current_mode)):
-                _label,_pred = self.assign_process_process(self._all_leaf_tensors.get_all_tensors(sequence_ind,current_mode))
+                _label,_pred = self.assign_process_process(self._all_leaf_tensors.get_all_tensors(sequence_ind,current_mode),self._current_activator)
                 self.train_one_step_by_equation(_label,_pred)
 
         return self._all_leaf_tensors.get_all_params()
@@ -139,7 +139,7 @@ class TorchPlus:
         ret = []
         for sequence_ind in range(self._all_leaf_tensors.get_length(current_mode)):
             print(sequence_ind)
-            _,_pred = self.assign_process_process(self._all_leaf_tensors.get_all_tensors(sequence_ind,current_mode))
+            _,_pred = self.assign_process_process(self._all_leaf_tensors.get_all_tensors(sequence_ind,current_mode),self._current_activator)
             ret.append(_pred)
         
         return ret
