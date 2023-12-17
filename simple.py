@@ -1,6 +1,6 @@
 import torch
 from dataclasses import dataclass,field
-from typing import Any,Dict,Callable
+from typing import Any,Dict,Callable,Self
 
 from enum import Enum
 
@@ -9,6 +9,10 @@ class TTPType(Enum):
     DEFAULT = 0
     INPUT = 1
     PARAMETER = 2
+
+class ModeType(Enum):
+    TRAIN = 0
+    PREDICT = 1
 
 @dataclass
 class TorchTensorPlus():
@@ -55,17 +59,33 @@ class TorchTensorPlus():
             raise "error"
     
 
+#train mode
+#input,output,... => sequence, parameter => nonsequence
+#prediction mode
+#input => sequence, parameter=> nonsequence, default=> not used 
+
 @dataclass
 class TensorManager:
     tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
 
-    def get_all_tensors(self,key):
-        return {tensor_name: self.tensors[tensor_name][key]  for tensor_name in self.tensors}
+    def get_all_tensors(self:Self,current_sequence:int,mode:ModeType):
+        if mode == ModeType.TRAIN:
+            return {tensor_name: self.tensors[tensor_name][current_sequence]  for tensor_name in self.tensors}
+        elif mode == ModeType.PREDICT:
+            ret={tensor_name: self.tensors[tensor_name][current_sequence]  for tensor_name in self.tensors if self.tensors[tensor_name].ttype != TTPType.DEFAULT}
+            nonret={tensor_name: None for tensor_name in self.tensors if self.tensors[tensor_name].ttype == TTPType.DEFAULT}
+            ret.update(nonret.items())
+            return ret
 
-    def get_length(self):
-        for tensor_name in self.tensors:
-            return self.tensors[tensor_name].tensor.shape[0]
-        #return [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors]
+    def get_length(self,mode:ModeType):
+        #set as sequence length of input if prediction.
+        if mode == ModeType.TRAIN:
+            comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors]
+            return min(comparison)
+        elif mode == ModeType.PREDICT:
+            comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].ttype == TTPType.INPUT]
+            return comparison[0]
+        
 
     def get_all_params(self):
         return [self.tensors[key].tensor for key in self.tensors if self.tensors[key].ttype == TTPType.PARAMETER]
@@ -100,22 +120,27 @@ class TorchPlus:
         optim.step()
 
     def train(self):
+        current_mode = ModeType.TRAIN
         #all terminals
         self._current_activator = self.meta_activator()
 
         for _ in range(self.meta_optimizer_epoch):
-            for sequence_ind in range(self._all_leaf_tensors.get_length()):
-                _label,_pred = self.assign_process_process(self._all_leaf_tensors.get_all_tensors(sequence_ind))
+            for sequence_ind in range(self._all_leaf_tensors.get_length(current_mode)):
+                _label,_pred = self.assign_process_process(self._all_leaf_tensors.get_all_tensors(sequence_ind,current_mode))
                 self.train_one_step_by_equation(_label,_pred)
 
         return self._all_leaf_tensors.get_all_params()
     
     def predict(self,**kwarg):
+        current_mode = ModeType.PREDICT
         for key in kwarg:
-            self.all_leaf_tensors.tensors[key].tensor = kwarg[key]
+            self[key].tensor = kwarg[key]
         
-        _pred=None
-        for sequence_ind in range(self.all_leaf_tensors.get_length()):
-            _pred = self.assign_process_process(self.all_leaf_tensors.get_all_tensors(sequence_ind))
         
-        return _pred
+        ret = []
+        for sequence_ind in range(self._all_leaf_tensors.get_length(current_mode)):
+            print(sequence_ind)
+            _,_pred = self.assign_process_process(self._all_leaf_tensors.get_all_tensors(sequence_ind,current_mode))
+            ret.append(_pred)
+        
+        return ret
