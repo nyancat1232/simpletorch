@@ -99,6 +99,16 @@ class TorchPlus:
 
     def __setitem__(self,key,value):
         self._all_leaf_tensors.tensors_prediction[key] = value
+
+    @property
+    def label_tensor(self):
+        return self._all_leaf_tensors.tensors_label
+    @label_tensor.setter
+    def label_tensor(self,tor_tensor : torch.Tensor):
+        self._all_leaf_tensors.tensors_label = tor_tensor
+        return self._all_leaf_tensors.tensors_label
+
+        
     
     assign_process_prediction : Callable = None
 
