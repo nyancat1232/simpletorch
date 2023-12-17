@@ -15,6 +15,9 @@ class ModeType(Enum):
     TRAIN = 0
     PREDICT = 1
 
+#default tensor's axis_sequence => 0 if train, -1 if predict
+#default tensor's tensor => ? if train, ? if predict
+
 @dataclass
 class TorchTensorPlus():
     '''
@@ -30,7 +33,6 @@ class TorchTensorPlus():
     '''
     ttype : TTPType
     axis_sequence : int = -1
-
     _tensor : torch.Tensor = field(repr=False,init=False)
     @property
     def tensor(self):
@@ -58,37 +60,26 @@ class TorchTensorPlus():
 
 @dataclass
 class SequenceTensorManager:
-    tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
+    tensors_prediction : Dict[str,TorchTensorPlus] = field(default_factory=dict)
+    tensors_label : TorchTensorPlus = None
 
     def __getitem__(self,pos:Union[Tuple[int,str],int]):
         try:
             sequence_index , tensor_name = pos
-            return self.tensors[tensor_name][sequence_index]
+            return self.tensors_prediction[tensor_name][sequence_index]
         except:
-            return {key : self.tensors[key][pos] for key in self.tensors}
+            return {key : self.tensors_prediction[key][pos] for key in self.tensors_prediction}
     
-    def get_length(self,mode:ModeType):
+
+    def get_length(self):
         #set as sequence length of input if prediction.
-        if mode == ModeType.TRAIN:
-            comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].axis_sequence >= 0]
-            return comparison[0]
-        elif mode == ModeType.PREDICT:
-            comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].ttype == TTPType.INPUT]
-            return comparison[0]
+        for tensor_name in self.tensors_prediction:
+            if self.tensors_prediction[tensor_name].ttype == TTPType.INPUT:
+                return len(self.tensors_prediction[tensor_name].tensor)
     
     def get_all_params(self):
-        return {key:self.tensors[key].tensor for key in self.tensors if self.tensors[key].ttype == TTPType.PARAMETER}
+        return {key:self.tensors_prediction[key].tensor for key in self.tensors_prediction if self.tensors_prediction[key].ttype == TTPType.PARAMETER}
 
-    def get_current_tensors(self:Self,current_sequence:int,mode:ModeType):
-        _current_tensors = self[current_sequence]
-
-        if mode ==ModeType.PREDICT:
-            key_default_tensors = [key for key in self.tensors if self.tensors[key].ttype == TTPType.DEFAULT]
-            for key in key_default_tensors:
-                del _current_tensors[key]
-
-        return _current_tensors
-    
     def get_current_tensors_unsqueezed(self:Self,current_sequence:int,mode:ModeType):
         def to_dim(tensor:torch.Tensor,dim:int):
             dim_diff = dim-tensor.dim()
@@ -117,12 +108,12 @@ class TorchPlus:
     
     _all_leaf_tensors : SequenceTensorManager = field(init=False,default_factory=SequenceTensorManager)
     def __getitem__(self,key):
-        return self._all_leaf_tensors.tensors[key]
+        return self._all_leaf_tensors.tensors_prediction[key]
 
     def __setitem__(self,key,value):
-        self._all_leaf_tensors.tensors[key] = value
+        self._all_leaf_tensors.tensors_prediction[key] = value
     
-    assign_process_process : Callable = None
+    assign_process_prediction : Callable = None
 
     def train_one_step_by_equation(self,label,prediction_quation):
         loss = self.meta_error_measurement()(label,  prediction_quation)
@@ -133,26 +124,24 @@ class TorchPlus:
 
     def train(self):
         #filter current sequence => unify dimensions => cals
-        current_mode = ModeType.TRAIN
-        #all terminals
-        self._current_activator = self.meta_activator()
+
 
         for _ in range(self.meta_optimizer_epoch):
-            for sequence_ind in range(self._all_leaf_tensors.get_length(current_mode)):
-                _label,_pred = self.assign_process_process(self._all_leaf_tensors.get_current_tensors_unsqueezed(sequence_ind,current_mode),self._current_activator)
-                self.train_one_step_by_equation(_label,_pred)
+            for pred_tensors,lab_tensors in zip(self._all_leaf_tensors,self._all_leaf_tensors.tensors_label):
+                pred = self.assign_process_prediction(pred_tensors,self.meta_activator)
+                self.train_one_step_by_equation(lab_tensors,pred)
 
         return self._all_leaf_tensors.get_all_params()
     
     def predict(self,**kwarg):
-        current_mode = ModeType.PREDICT
+
         for key in kwarg:
             self[key].tensor = kwarg[key]
         
         
         ret = []
-        for sequence_ind in range(self._all_leaf_tensors.get_length(current_mode)):
-            _,_pred = self.assign_process_process(self._all_leaf_tensors.get_current_tensors_unsqueezed(sequence_ind,current_mode),self._current_activator)
-            ret.append(_pred)
+        for pred_tensors in self._all_leaf_tensors:
+            pred = self.assign_process_prediction(pred_tensors,self.meta_activator)
+            ret.append(pred)
         
         return ret
