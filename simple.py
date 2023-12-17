@@ -91,7 +91,7 @@ class TorchPlus:
     meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-5})
     meta_optimizer_epoch : int = 2000
     meta_error_measurement : Any = torch.nn.MSELoss()
-    meta_activator : Any = torch.relu
+    meta_activator : Callable = torch.relu
     
     _all_leaf_tensors : SequenceTensorManager = field(init=False,default_factory=SequenceTensorManager)
     def __getitem__(self,key):
@@ -126,7 +126,6 @@ class TorchPlus:
 
     def train(self):
         #filter current sequence => unify dimensions => cals
-
 
         for _ in range(self.meta_optimizer_epoch):
             for pred_tensors,lab_tensors in zip(self._all_leaf_tensors,self._all_leaf_tensors.tensors_label):
