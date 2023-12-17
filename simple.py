@@ -12,6 +12,17 @@ class TTPType(Enum):
 
 @dataclass
 class TorchTensorPlus():
+    '''
+    (description)
+    ## Parameters:
+    ttype : TTPType
+    tensor type.
+    axis_sequence : int
+    if -1, then this is not a sequence.
+    else, then this is a sequence of axis_sequence
+    ttype : TTPType
+    tensor type.
+    '''
     ttype : TTPType
     axis_sequence : int = -1
     _tensor : torch.Tensor = field(repr=False,init=False)
