@@ -46,7 +46,7 @@ class TorchTensorPlus():
         if self.axis_sequence == 0:
             return self._tensor[key]
         elif self.axis_sequence <0 :
-            return self._tensor.unsqueeze(0)
+            return self._tensor
         else:
             raise "error"
     
