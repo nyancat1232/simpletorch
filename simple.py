@@ -90,8 +90,8 @@ class TorchPlus:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
     meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-5})
     meta_optimizer_epoch : int = 2000
-    meta_error_measurement : Any = torch.nn.MSELoss
-    meta_activator : Any = nn.ReLU
+    meta_error_measurement : Any = torch.nn.MSELoss()
+    meta_activator : Any = torch.relu
     
     _all_leaf_tensors : SequenceTensorManager = field(init=False,default_factory=SequenceTensorManager)
     def __getitem__(self,key):
@@ -113,11 +113,15 @@ class TorchPlus:
     assign_process_prediction : Callable = None
 
     def train_one_step_by_equation(self,label,prediction_quation):
-        loss = self.meta_error_measurement()(label,  prediction_quation)
+        print(prediction_quation)
         optim = self.meta_optimizer(self._all_leaf_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
+        
+        loss = self.meta_error_measurement(label,  prediction_quation)
         loss.backward()
         optim.step()
+
+        return loss
 
     def train(self):
         #filter current sequence => unify dimensions => cals
@@ -125,10 +129,9 @@ class TorchPlus:
 
         for _ in range(self.meta_optimizer_epoch):
             for pred_tensors,lab_tensors in zip(self._all_leaf_tensors,self._all_leaf_tensors.tensors_label):
-                current_activator = self.meta_activator()
-                pred = self.assign_process_prediction(pred_tensors,current_activator)
-                self.train_one_step_by_equation(lab_tensors,pred)
-
+                pred = self.assign_process_prediction(pred_tensors,self.meta_activator)
+                loss = self.train_one_step_by_equation(lab_tensors,pred)
+                
         return self._all_leaf_tensors.get_all_params()
     
     def predict(self,**kwarg):
@@ -139,8 +142,7 @@ class TorchPlus:
         
         ret = []
         for pred_tensors in self._all_leaf_tensors:
-            current_activator = self.meta_activator()
-            pred = self.assign_process_prediction(pred_tensors,current_activator)
+            pred = self.assign_process_prediction(pred_tensors,self.meta_activator)
             ret.append(pred)
         
         return ret
