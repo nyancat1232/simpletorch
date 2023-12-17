@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from dataclasses import dataclass,field
-from typing import Any,Dict,Callable,Self
+from typing import Any,Dict,Callable,Self,Tuple
 
 from enum import Enum
 
@@ -60,11 +60,30 @@ class TorchTensorPlus():
 class SequenceTensorManager:
     tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
 
-    def get_current_tensors(self:Self,current_sequence:int,mode:ModeType):
+    def __getitem__(self,pos:Tuple):
+        tensor_name, sequence_index = pos
+        return self.tensors[tensor_name][sequence_index]
+
+    def get_all_params(self):
+        return {key:self.tensors[key].tensor for key in self.tensors if self.tensors[key].ttype == TTPType.PARAMETER}
+    
+    def get_length(self,mode:ModeType):
+        #set as sequence length of input if prediction.
         if mode == ModeType.TRAIN:
-            _current_tensors = {tensor_name: self.tensors[tensor_name][current_sequence] for tensor_name in self.tensors}
+            comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].axis_sequence >= 0]
+            return min(comparison)
         elif mode == ModeType.PREDICT:
-            _current_tensors = {tensor_name:self.tensors[tensor_name][current_sequence] for tensor_name in self.tensors if self.tensors[tensor_name].ttype != TTPType.DEFAULT}
+            comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].ttype == TTPType.INPUT]
+            return comparison[0]
+        
+    def get_current_tensors(self:Self,current_sequence:int,mode:ModeType):
+        _current_tensors = {tensor_name: self.tensors[tensor_name][current_sequence] for tensor_name in self.tensors}
+        if mode == ModeType.PREDICT:
+            for tensor_name in self.tensors:
+                if self.tensors[tensor_name].ttype == TTPType.DEFAULT:
+                    _current_tensors[tensor_name] = TorchTensorPlus()
+            
+
         return _current_tensors
     
     def get_current_tensors_unsqueezed(self:Self,current_sequence:int,mode:ModeType):
@@ -79,19 +98,7 @@ class SequenceTensorManager:
         max_dim = max([current_tensors[tensor_name].dim() for tensor_name in current_tensors])
         return {tensor_name:to_dim(current_tensors[tensor_name],max_dim) for tensor_name in current_tensors}
 
-    def get_length(self,mode:ModeType):
-        #set as sequence length of input if prediction.
-        if mode == ModeType.TRAIN:
-            comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].axis_sequence >= 0]
-            return min(comparison)
-        elif mode == ModeType.PREDICT:
-            comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].ttype == TTPType.INPUT]
-            return comparison[0]
-        
 
-    def get_all_params(self):
-        return {key:self.tensors[key].tensor for key in self.tensors if self.tensors[key].ttype == TTPType.PARAMETER}
-    
 
 
         
@@ -116,7 +123,7 @@ class TorchPlus:
 
     def train_one_step_by_equation(self,label,prediction_quation):
         loss = self.meta_error_measurement()(label,  prediction_quation)
-        optim = self.meta_optimizer(self._all_leaf_tensors.get_all_params(),**self.meta_optimizer_params)
+        optim = self.meta_optimizer(self._all_leaf_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
         loss.backward()
         optim.step()
@@ -142,8 +149,7 @@ class TorchPlus:
         
         ret = []
         for sequence_ind in range(self._all_leaf_tensors.get_length(current_mode)):
-            print(sequence_ind)
-            _,_pred = self.assign_process_process(self._all_leaf_tensors.get_all_tensors(sequence_ind,current_mode),self._current_activator)
+            _,_pred = self.assign_process_process(self._all_leaf_tensors.get_current_tensors_unsqueezed(sequence_ind,current_mode),self._current_activator)
             ret.append(_pred)
         
         return ret
