@@ -83,29 +83,32 @@ class TorchPlus:
     meta_error_measurement : Any = torch.nn.MSELoss
     meta_activator : Any = None
     
-    all_leaf_tensors : TensorManager = field(default_factory=TensorManager)
+    _all_leaf_tensors : TensorManager = field(init=False,default_factory=TensorManager)
+    def __getitem__(self,key):
+        return self._all_leaf_tensors.tensors[key]
 
-    assign_leaf_tensors : Callable = None
+    def __setitem__(self,key,value):
+        self._all_leaf_tensors.tensors[key] = value
+    
     assign_process_process : Callable = None
 
     def train_one_step_by_equation(self,label,prediction_quation):
         loss = self.meta_error_measurement()(label,  prediction_quation)
-        optim = self.meta_optimizer(self.all_leaf_tensors.get_all_params(),lr=self.meta_optimizer_learning_rate)
+        optim = self.meta_optimizer(self._all_leaf_tensors.get_all_params(),lr=self.meta_optimizer_learning_rate)
         optim.zero_grad()
         loss.backward()
         optim.step()
 
     def train(self):
         #all terminals
-        self.assign_leaf_tensors(self)
         self._current_activator = self.meta_activator()
 
         for _ in range(self.meta_optimizer_epoch):
-            for sequence_ind in range(self.all_leaf_tensors.get_length()):
-                _label,_pred = self.assign_process_process(self.all_leaf_tensors.get_all_tensors(sequence_ind))
+            for sequence_ind in range(self._all_leaf_tensors.get_length()):
+                _label,_pred = self.assign_process_process(self._all_leaf_tensors.get_all_tensors(sequence_ind))
                 self.train_one_step_by_equation(_label,_pred)
 
-        return self.all_leaf_tensors.get_all_params()
+        return self._all_leaf_tensors.get_all_params()
     
     def predict(self,**kwarg):
         for key in kwarg:
