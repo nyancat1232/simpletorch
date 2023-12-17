@@ -80,19 +80,6 @@ class SequenceTensorManager:
     def get_all_params(self):
         return {key:self.tensors_prediction[key].tensor for key in self.tensors_prediction if self.tensors_prediction[key].ttype == TTPType.PARAMETER}
 
-    def get_current_tensors_unsqueezed(self:Self,current_sequence:int,mode:ModeType):
-        def to_dim(tensor:torch.Tensor,dim:int):
-            dim_diff = dim-tensor.dim()
-            new_tensor = tensor
-            for _ in range(dim_diff):
-                new_tensor=new_tensor.unsqueeze(0)
-            return new_tensor
-        
-        current_tensors = self.get_current_tensors(current_sequence,mode)
-        max_dim = max([current_tensors[tensor_name].dim() for tensor_name in current_tensors])
-        return {tensor_name:to_dim(current_tensors[tensor_name],max_dim) for tensor_name in current_tensors}
-
-
 
 
         
