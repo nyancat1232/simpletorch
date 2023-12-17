@@ -125,7 +125,8 @@ class TorchPlus:
 
         for _ in range(self.meta_optimizer_epoch):
             for pred_tensors,lab_tensors in zip(self._all_leaf_tensors,self._all_leaf_tensors.tensors_label):
-                pred = self.assign_process_prediction(pred_tensors,self.meta_activator)
+                current_activator = self.meta_activator()
+                pred = self.assign_process_prediction(pred_tensors,current_activator)
                 self.train_one_step_by_equation(lab_tensors,pred)
 
         return self._all_leaf_tensors.get_all_params()
@@ -138,7 +139,8 @@ class TorchPlus:
         
         ret = []
         for pred_tensors in self._all_leaf_tensors:
-            pred = self.assign_process_prediction(pred_tensors,self.meta_activator)
+            current_activator = self.meta_activator()
+            pred = self.assign_process_prediction(pred_tensors,current_activator)
             ret.append(pred)
         
         return ret
