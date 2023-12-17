@@ -113,13 +113,14 @@ class TorchPlus:
     assign_process_prediction : Callable = None
 
     def train_one_step_by_equation(self,label,prediction_quation):
-        print(prediction_quation)
         optim = self.meta_optimizer(self._all_leaf_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
         
         loss = self.meta_error_measurement(label,  prediction_quation)
+        print(loss)
         loss.backward()
         optim.step()
+        optim.zero_grad()
 
         return loss
 
