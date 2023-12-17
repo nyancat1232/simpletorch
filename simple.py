@@ -88,7 +88,7 @@ class SequenceTensorManager:
 @dataclass
 class TorchPlus:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
-    meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':0.015})
+    meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-5})
     meta_optimizer_epoch : int = 2000
     meta_error_measurement : Any = torch.nn.MSELoss
     meta_activator : Any = nn.ReLU
