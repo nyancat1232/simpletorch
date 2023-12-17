@@ -57,17 +57,27 @@ class TorchTensorPlus():
 #input => sequence, parameter=> nonsequence, default=> not used 
 
 @dataclass
-class TensorManager:
+class SequenceTensorManager:
     tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
 
-    def get_all_tensors(self:Self,current_sequence:int,mode:ModeType):
+    def get_current_tensors(self:Self,current_sequence:int,mode:ModeType):
         if mode == ModeType.TRAIN:
-            return {tensor_name: self.tensors[tensor_name][current_sequence]  for tensor_name in self.tensors}
+            _current_tensors = {tensor_name: self.tensors[tensor_name][current_sequence] for tensor_name in self.tensors}
         elif mode == ModeType.PREDICT:
-            ret={tensor_name: self.tensors[tensor_name][current_sequence]  for tensor_name in self.tensors if self.tensors[tensor_name].ttype != TTPType.DEFAULT}
-            nonret={tensor_name: None for tensor_name in self.tensors if self.tensors[tensor_name].ttype == TTPType.DEFAULT}
-            ret.update(nonret.items())
-            return ret
+            _current_tensors = {tensor_name:self.tensors[tensor_name][current_sequence] for tensor_name in self.tensors if self.tensors[tensor_name].ttype != TTPType.DEFAULT}
+        return _current_tensors
+    
+    def get_current_tensors_unsqueezed(self:Self,current_sequence:int,mode:ModeType):
+        def to_dim(tensor:torch.Tensor,dim:int):
+            dim_diff = dim-tensor.dim()
+            new_tensor = tensor
+            for _ in range(dim_diff):
+                new_tensor=new_tensor.unsqueeze(0)
+            return new_tensor
+        
+        current_tensors = self.get_current_tensors(current_sequence,mode)
+        max_dim = max([current_tensors[tensor_name].dim() for tensor_name in current_tensors])
+        return {tensor_name:to_dim(current_tensors[tensor_name],max_dim) for tensor_name in current_tensors}
 
     def get_length(self,mode:ModeType):
         #set as sequence length of input if prediction.
@@ -80,7 +90,7 @@ class TensorManager:
         
 
     def get_all_params(self):
-        return [self.tensors[key].tensor for key in self.tensors if self.tensors[key].ttype == TTPType.PARAMETER]
+        return {key:self.tensors[key].tensor for key in self.tensors if self.tensors[key].ttype == TTPType.PARAMETER}
     
 
 
@@ -95,7 +105,7 @@ class TorchPlus:
     meta_error_measurement : Any = torch.nn.MSELoss
     meta_activator : Any = nn.ReLU
     
-    _all_leaf_tensors : TensorManager = field(init=False,default_factory=TensorManager)
+    _all_leaf_tensors : SequenceTensorManager = field(init=False,default_factory=SequenceTensorManager)
     def __getitem__(self,key):
         return self._all_leaf_tensors.tensors[key]
 
@@ -112,13 +122,14 @@ class TorchPlus:
         optim.step()
 
     def train(self):
+        #filter current sequence => unify dimensions => cals
         current_mode = ModeType.TRAIN
         #all terminals
         self._current_activator = self.meta_activator()
 
         for _ in range(self.meta_optimizer_epoch):
             for sequence_ind in range(self._all_leaf_tensors.get_length(current_mode)):
-                _label,_pred = self.assign_process_process(self._all_leaf_tensors.get_all_tensors(sequence_ind,current_mode),self._current_activator)
+                _label,_pred = self.assign_process_process(self._all_leaf_tensors.get_current_tensors_unsqueezed(sequence_ind,current_mode),self._current_activator)
                 self.train_one_step_by_equation(_label,_pred)
 
         return self._all_leaf_tensors.get_all_params()
