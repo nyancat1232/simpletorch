@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from dataclasses import dataclass,field
-from typing import Any,Dict,Callable,Self,Tuple
+from typing import Any,Dict,Callable,Self,Tuple,Union
 
 from enum import Enum
 
@@ -60,9 +60,12 @@ class TorchTensorPlus():
 class SequenceTensorManager:
     tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
 
-    def __getitem__(self,pos:Tuple):
-        tensor_name, sequence_index = pos
-        return self.tensors[tensor_name][sequence_index]
+    def __getitem__(self,pos:Union[Tuple[int,str],int]):
+        try:
+            sequence_index , tensor_name = pos
+            return self.tensors[tensor_name][sequence_index]
+        except:
+            return {key : self.tensors[key][pos] for key in self.tensors}
 
     def get_all_params(self):
         return {key:self.tensors[key].tensor for key in self.tensors if self.tensors[key].ttype == TTPType.PARAMETER}
