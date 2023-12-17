@@ -56,7 +56,7 @@ class TorchTensorPlus():
     
 
 @dataclass
-class AllTensorsToSequence:
+class TensorManager:
     tensors : Dict[str,TorchTensorPlus] = field(default_factory=dict)
 
     def get_all_tensors(self,key):
@@ -83,7 +83,7 @@ class TorchPlus:
     meta_error_measurement : Any = torch.nn.MSELoss
     meta_activator : Any = None
     
-    all_leaf_tensors : AllTensorsToSequence = field(default_factory=AllTensorsToSequence)
+    all_leaf_tensors : TensorManager = field(default_factory=TensorManager)
 
     assign_leaf_tensors : Callable = None
     assign_process_process : Callable = None
