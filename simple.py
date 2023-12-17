@@ -66,26 +66,26 @@ class SequenceTensorManager:
             return self.tensors[tensor_name][sequence_index]
         except:
             return {key : self.tensors[key][pos] for key in self.tensors}
-
-    def get_all_params(self):
-        return {key:self.tensors[key].tensor for key in self.tensors if self.tensors[key].ttype == TTPType.PARAMETER}
     
     def get_length(self,mode:ModeType):
         #set as sequence length of input if prediction.
         if mode == ModeType.TRAIN:
             comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].axis_sequence >= 0]
-            return min(comparison)
+            return comparison[0]
         elif mode == ModeType.PREDICT:
             comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].ttype == TTPType.INPUT]
             return comparison[0]
-        
+    
+    def get_all_params(self):
+        return {key:self.tensors[key].tensor for key in self.tensors if self.tensors[key].ttype == TTPType.PARAMETER}
+
     def get_current_tensors(self:Self,current_sequence:int,mode:ModeType):
-        _current_tensors = {tensor_name: self.tensors[tensor_name][current_sequence] for tensor_name in self.tensors}
-        if mode == ModeType.PREDICT:
-            for tensor_name in self.tensors:
-                if self.tensors[tensor_name].ttype == TTPType.DEFAULT:
-                    _current_tensors[tensor_name] = TorchTensorPlus()
-            
+        _current_tensors = self[current_sequence]
+
+        if mode ==ModeType.PREDICT:
+            key_default_tensors = [key for key in self.tensors if self.tensors[key].ttype == TTPType.DEFAULT]
+            for key in key_default_tensors:
+                del _current_tensors[key]
 
         return _current_tensors
     
