@@ -50,14 +50,6 @@ class TorchTensorPlus():
         else:
             raise "error"
     
-    def __iter__(self):
-        if self.axis_sequence == 0:
-            return self._tensor.__iter__()
-        elif self.axis_sequence <0 :
-            return self._tensor.unsqueeze(0).__iter__()
-        else:
-            raise "error"
-    
 
 #train mode
 #input,output,... => sequence, parameter => nonsequence
@@ -80,7 +72,7 @@ class TensorManager:
     def get_length(self,mode:ModeType):
         #set as sequence length of input if prediction.
         if mode == ModeType.TRAIN:
-            comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors]
+            comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].axis_sequence >= 0]
             return min(comparison)
         elif mode == ModeType.PREDICT:
             comparison = [len(self.tensors[tensor_name].tensor) for tensor_name in self.tensors if self.tensors[tensor_name].ttype == TTPType.INPUT]
