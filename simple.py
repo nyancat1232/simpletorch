@@ -29,12 +29,11 @@ class TorchTensorPlus():
     '''
     ttype : TTPType
     axis_sequence : int = -1
-    _tensor : torch.Tensor = field(repr=False,init=False)
 
+    _tensor : torch.Tensor = field(repr=False,init=False)
     @property
     def tensor(self):
         return self._tensor
-
     @tensor.setter
     def tensor(self,tor_tensor : torch.Tensor):
         self._tensor = tor_tensor
@@ -98,7 +97,7 @@ class TensorManager:
 @dataclass
 class TorchPlus:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
-    meta_optimizer_learning_rate : float = 0.015
+    meta_optimizer_params : Dict = field(default_factory=dict)
     meta_optimizer_epoch : int = 2000
     meta_error_measurement : Any = torch.nn.MSELoss
     meta_activator : Any = None
@@ -114,7 +113,7 @@ class TorchPlus:
 
     def train_one_step_by_equation(self,label,prediction_quation):
         loss = self.meta_error_measurement()(label,  prediction_quation)
-        optim = self.meta_optimizer(self._all_leaf_tensors.get_all_params(),lr=self.meta_optimizer_learning_rate)
+        optim = self.meta_optimizer(self._all_leaf_tensors.get_all_params(),**self.meta_optimizer_params)
         optim.zero_grad()
         loss.backward()
         optim.step()
