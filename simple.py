@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 from dataclasses import dataclass,field
 from typing import Any,Dict,Callable,Self
 
@@ -97,10 +98,10 @@ class TensorManager:
 @dataclass
 class TorchPlus:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
-    meta_optimizer_params : Dict = field(default_factory=dict)
+    meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':0.015})
     meta_optimizer_epoch : int = 2000
     meta_error_measurement : Any = torch.nn.MSELoss
-    meta_activator : Any = None
+    meta_activator : Any = nn.ReLU
     
     _all_leaf_tensors : TensorManager = field(init=False,default_factory=TensorManager)
     def __getitem__(self,key):
