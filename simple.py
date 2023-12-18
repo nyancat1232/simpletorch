@@ -61,11 +61,7 @@ class SequenceTensorManager:
     tensors_label : TorchTensorPlus = None
 
     def __getitem__(self,pos:Union[Tuple[int,str],int])->Union[torch.Tensor,Dict[str,torch.Tensor]]:
-        try:
-            sequence_index , tensor_name = pos
-            return self.tensors_prediction[tensor_name][sequence_index]
-        except:
-            return {key : self.tensors_prediction[key][pos] for key in self.tensors_prediction}
+        return {key : self.tensors_prediction[key][pos] for key in self.tensors_prediction}
     
     
     def get_all_params(self):
