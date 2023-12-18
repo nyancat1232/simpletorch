@@ -95,7 +95,7 @@ class TorchPlus:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
     meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-5})
     meta_optimizer_epoch : int = 2000
-    meta_data_per_iteration : int = 1
+    meta_optimizer_data_per_iteration : int = 1
     meta_error_measurement : Any = torch.nn.MSELoss()
     meta_activator : Callable = torch.relu
     
