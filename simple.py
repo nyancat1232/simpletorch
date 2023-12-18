@@ -56,6 +56,25 @@ class TorchTensorPlus():
 #input => sequence, parameter=> nonsequence, default=> not used 
 
 @dataclass
+class TensorsSquence:
+    _tensor_name : List[str] = field(repr=False,init=False)
+    _tensors : List[TorchTensorPlus] = field(repr=False,init=False)
+
+    def __post_init__(self):
+        self._tensor_name = []
+        self._tensors = []
+
+    def __getitem__(self,sequence_ind):
+        return {self._tensor_name[index] : self._tensors[index][sequence_ind] for index,_ in enumerate(self._tensor_name)}
+    
+    def new_tensor(self,name,tensorplus:TorchTensorPlus,tensor:torch.Tensor):
+        self._tensor_name.append(name)
+        current_ttp = tensorplus
+        current_ttp.tensor = tensor
+        self._tensors.append(current_ttp)
+    
+
+@dataclass
 class SequenceTensorManager:
     tensors_prediction : Dict[str,TorchTensorPlus] = field(default_factory=dict)
     tensors_label : TorchTensorPlus = None
