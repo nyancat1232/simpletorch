@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from dataclasses import dataclass,field
-from typing import Any,Dict,Callable,Self,Tuple,Union
+from typing import Any,Dict,Callable,Self,Tuple,Union,List
 
 from enum import Enum
 
@@ -63,7 +63,7 @@ class SequenceTensorManager:
     tensors_prediction : Dict[str,TorchTensorPlus] = field(default_factory=dict)
     tensors_label : TorchTensorPlus = None
 
-    def __getitem__(self,pos:Union[Tuple[int,str],int]):
+    def __getitem__(self,pos:Union[Tuple[int,str],int])->Union[torch.Tensor,Dict[str,torch.Tensor]]:
         try:
             sequence_index , tensor_name = pos
             return self.tensors_prediction[tensor_name][sequence_index]
@@ -80,7 +80,18 @@ class SequenceTensorManager:
     def get_all_params(self):
         return {key:self.tensors_prediction[key].tensor for key in self.tensors_prediction if self.tensors_prediction[key].ttype == TTPType.PARAMETER}
 
+def unsqueeze_to(tensor:torch.Tensor,dim):
+    new_tensor = tensor
+    current_dim = new_tensor.dim()
+    for _ in range(dim-current_dim):
+        new_tensor = new_tensor.unsqueeze(0)
+    return new_tensor
 
+def unsqueeze_tensors(tensors:Dict[str,torch.Tensor],max_dim=None):
+
+    max_dim = max([tensors[key].dim() for key in tensors])
+
+    return {key : unsqueeze_to(tensors[key],max_dim) for key in tensors},max_dim
 
         
 
@@ -129,8 +140,12 @@ class TorchPlus:
 
         for _ in range(self.meta_optimizer_epoch):
             for pred_tensors,lab_tensors in zip(self._all_leaf_tensors,self._all_leaf_tensors.tensors_label):
-                pred = self.assign_process_prediction(pred_tensors,self.meta_activator)
-                loss = self.train_one_step_by_equation(lab_tensors,pred)
+                pred_unsqueezed,max_dim = unsqueeze_tensors(pred_tensors)
+                pred = self.assign_process_prediction(pred_unsqueezed,self.meta_activator)
+                lab_unsqueezed = unsqueeze_to(lab_tensors,max_dim)
+                print(pred_unsqueezed)
+                print(lab_unsqueezed)
+                loss = self.train_one_step_by_equation(lab_unsqueezed,pred)
                 
         return self._all_leaf_tensors.get_all_params()
     
@@ -142,7 +157,8 @@ class TorchPlus:
         
         ret = []
         for pred_tensors in self._all_leaf_tensors:
-            pred = self.assign_process_prediction(pred_tensors,self.meta_activator)
+            pred_unsqueezed,_ = unsqueeze_tensors(pred_tensors)
+            pred = self.assign_process_prediction(pred_unsqueezed,self.meta_activator)
             ret.append(pred)
         
         return ret
