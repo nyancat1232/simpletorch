@@ -70,12 +70,6 @@ class SequenceTensorManager:
         except:
             return {key : self.tensors_prediction[key][pos] for key in self.tensors_prediction}
     
-
-    def get_length(self):
-        #set as sequence length of input if prediction.
-        for tensor_name in self.tensors_prediction:
-            if self.tensors_prediction[tensor_name].ttype == TTPType.INPUT:
-                return len(self.tensors_prediction[tensor_name].tensor)
     
     def get_all_params(self):
         return {key:self.tensors_prediction[key].tensor for key in self.tensors_prediction if self.tensors_prediction[key].ttype == TTPType.PARAMETER}
