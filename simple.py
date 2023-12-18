@@ -101,6 +101,7 @@ class TorchPlus:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
     meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-5})
     meta_optimizer_epoch : int = 2000
+    meta_data_per_iteration : int = 1
     meta_error_measurement : Any = torch.nn.MSELoss()
     meta_activator : Callable = torch.relu
     
@@ -141,10 +142,8 @@ class TorchPlus:
         for _ in range(self.meta_optimizer_epoch):
             for pred_tensors,lab_tensors in zip(self._all_leaf_tensors,self._all_leaf_tensors.tensors_label):
                 pred_unsqueezed,max_dim = unsqueeze_tensors(pred_tensors)
-                pred = self.assign_process_prediction(pred_unsqueezed,self.meta_activator)
                 lab_unsqueezed = unsqueeze_to(lab_tensors,max_dim)
-                print(pred_unsqueezed)
-                print(lab_unsqueezed)
+                pred = self.assign_process_prediction(pred_unsqueezed,self.meta_activator)
                 loss = self.train_one_step_by_equation(lab_unsqueezed,pred)
                 
         return self._all_leaf_tensors.get_all_params()
