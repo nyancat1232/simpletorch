@@ -60,7 +60,7 @@ class SequenceTensorManager:
     tensors_prediction : Dict[str,TorchTensorPlus] = field(default_factory=dict)
     tensors_label : TorchTensorPlus = None
 
-    def __getitem__(self,pos:Union[Tuple[int,str],int])->Union[torch.Tensor,Dict[str,torch.Tensor]]:
+    def __getitem__(self,pos:int)->Union[torch.Tensor,Dict[str,torch.Tensor]]:
         return {key : self.tensors_prediction[key][pos] for key in self.tensors_prediction}
     
     
