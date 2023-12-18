@@ -11,9 +11,6 @@ class TTPType(Enum):
     INPUT = 1
     PARAMETER = 2
 
-class ModeType(Enum):
-    TRAIN = 0
-    PREDICT = 1
 
 #default tensor's axis_sequence => 0 if train, -1 if predict
 #default tensor's tensor => ? if train, ? if predict
