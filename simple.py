@@ -6,8 +6,8 @@ from pyplus.pytorch.internal.internal import *
 @dataclass
 class TorchPlus:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
-    meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-5})
-    meta_epoch : int = 2000
+    meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-4})
+    meta_epoch : int = 3000
     meta_data_per_iteration : int = 1
     meta_error_measurement : Any = torch.nn.MSELoss()
     meta_activator : Callable = field(default_factory=nn.LeakyReLU)
