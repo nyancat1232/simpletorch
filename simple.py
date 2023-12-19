@@ -133,7 +133,7 @@ class TorchPlus:
                 pred = self.assign_process_prediction(pred_unsqueezed,self.meta_activator)
                 loss = self.train_one_step_by_equation([value for value in lab_unsqueezed.values()][0],pred)
                 
-        return self.all_predict_tensors.get_all_params()
+        return lambda **kwarg: self.predict(**kwarg)
     
     def predict(self,**kwarg):
 
