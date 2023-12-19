@@ -28,14 +28,16 @@ class TorchPlus:
 
         return loss
 
-    def train(self):
+    def train(self,show_progress=True):
         #filter current sequence => unify dimensions => cals
         self._current_mode = ProcessMode.ASSIGN
-        pred = self.assign_process_prediction(self.meta_activator)
+        self.assign_process_prediction(self.meta_activator)
         self._current_mode = ProcessMode.PROCESS
 
         for _ in range(self.meta_epoch):
             for pred_tensors,lab_tensors in zip(self.all_predict_tensors,self.all_label_tensors):
+                if show_progress:
+                    print(pred_tensors)
                 self._pred_unsqueezed,max_dim = unsqueeze_tensors(pred_tensors)
                 self._lab_unsqueezed,_ = unsqueeze_tensors(lab_tensors,max_dim)
 
