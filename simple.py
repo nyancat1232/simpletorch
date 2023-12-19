@@ -105,16 +105,15 @@ class TorchPlus:
     meta_optimizer_epoch : int = 2000
     meta_optimizer_data_per_iteration : int = 1
     meta_error_measurement : Any = torch.nn.MSELoss()
-    meta_activator : Callable = torch.relu
+    meta_activator : Callable = field(default_factory=nn.LeakyReLU)
     
-    _all_predict_tensors : TensorsSquence = field(init=False,default_factory=TensorsSquence)
-    _all_label_tensors : TensorsSquence = field(init=False,default_factory=TensorsSquence)
+    all_predict_tensors : TensorsSquence = field(init=False,default_factory=TensorsSquence)
+    all_label_tensors : TensorsSquence = field(init=False,default_factory=TensorsSquence)
 
     assign_process_prediction : Callable = None
 
     def train_one_step_by_equation(self,label,prediction_quation):
-        print(label,prediction_quation)
-        optim = self.meta_optimizer(self._all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
+        optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
         
         loss = self.meta_error_measurement(label,  prediction_quation)
@@ -128,22 +127,22 @@ class TorchPlus:
         #filter current sequence => unify dimensions => cals
 
         for _ in range(self.meta_optimizer_epoch):
-            for pred_tensors,lab_tensors in zip(self._all_predict_tensors,self._all_label_tensors):
+            for pred_tensors,lab_tensors in zip(self.all_predict_tensors,self.all_label_tensors):
                 pred_unsqueezed,max_dim = unsqueeze_tensors(pred_tensors)
                 lab_unsqueezed,_ = unsqueeze_tensors(lab_tensors,max_dim)
                 pred = self.assign_process_prediction(pred_unsqueezed,self.meta_activator)
                 loss = self.train_one_step_by_equation([value for value in lab_unsqueezed.values()][0],pred)
                 
-        return self._all_predict_tensors.get_all_params()
+        return self.all_predict_tensors.get_all_params()
     
     def predict(self,**kwarg):
 
         for key in kwarg:
-            self._all_predict_tensors.change_tensor(key,kwarg[key])
+            self.all_predict_tensors.change_tensor(key,kwarg[key])
         
         
         ret = []
-        for pred_tensors in self._all_predict_tensors:
+        for pred_tensors in self.all_predict_tensors:
             pred_unsqueezed,_ = unsqueeze_tensors(pred_tensors)
             pred = self.assign_process_prediction(pred_unsqueezed,self.meta_activator)
             ret.append(pred)
