@@ -15,9 +15,18 @@ class TorchPlus:
     all_predict_tensors : TensorsSquence = field(init=False,default_factory=TensorsSquence)
     all_label_tensors : TensorsSquence = field(init=False,default_factory=TensorsSquence)
 
-    assign_process_prediction : Callable = None
+    _assign_process_prediction : Callable = None
+    
+    @property
+    def process(self):
+        return self._assign_process_prediction
 
-    def train_one_step_by_equation(self,label,prediction_quation):
+    @process.setter
+    def process(self,function:Callable):
+        self._assign_process_prediction = function
+
+
+    def _train_one_step_by_equation(self,label,prediction_quation):
         optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
         
@@ -31,7 +40,7 @@ class TorchPlus:
     def train(self,show_progress=True):
         #filter current sequence => unify dimensions => cals
         self._current_mode = ProcessMode.ASSIGN
-        self.assign_process_prediction(self.meta_activator)
+        self._assign_process_prediction(self.meta_activator)
         self._current_mode = ProcessMode.PROCESS
 
         for _ in range(self.meta_epoch):
@@ -41,8 +50,8 @@ class TorchPlus:
                 self._pred_unsqueezed,max_dim = unsqueeze_tensors(pred_tensors)
                 self._lab_unsqueezed,_ = unsqueeze_tensors(lab_tensors,max_dim)
 
-                pred = self.assign_process_prediction(self.meta_activator)
-                loss = self.train_one_step_by_equation([value for value in self._lab_unsqueezed.values()][0],pred)
+                pred = self._assign_process_prediction(self.meta_activator)
+                loss = self._train_one_step_by_equation([value for value in self._lab_unsqueezed.values()][0],pred)
                 
         return lambda **kwarg: self.predict(**kwarg)
     
@@ -58,7 +67,7 @@ class TorchPlus:
             self._pred_unsqueezed,_ = unsqueeze_tensors(pred_tensors)
 
             self._current_mode = ProcessMode.PROCESS
-            pred = self.assign_process_prediction(self.meta_activator)
+            pred = self._assign_process_prediction(self.meta_activator)
             ret.append(pred)
         
         return ret
