@@ -1,5 +1,5 @@
 from pyplus.pytorch.internal.internal import *
-
+from typing import Dict
 
 
 #https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
@@ -72,25 +72,27 @@ class TorchPlus:
         
         return ret
     
-    def input(self:Self,name:str,tensor:torch.Tensor):
+    def input(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0):
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_predict_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.DEFAULT,axis_sequence=0),tensor)
+            self.all_predict_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.DEFAULT,axis_sequence=axis_sequence),tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._pred_unsqueezed[name] 
 
-    def parameter(self:Self,name:str,tensor:torch.Tensor):
+    def parameter(self:Self,name:str,tensor:torch.Tensor,axis_sequence=-1):
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_predict_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.PARAMETER,axis_sequence=-1),tensor)
+            self.all_predict_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.PARAMETER,axis_sequence=axis_sequence),tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._pred_unsqueezed[name] 
 
-    def label(self:Self,name:str,tensor:torch.Tensor):
+    def label(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0):
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_label_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.DEFAULT,axis_sequence=0),tensor)
+            self.all_label_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.DEFAULT,axis_sequence=axis_sequence),tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._lab_unsqueezed[name] 
 
+    def get_parameters(self:Self)->Dict:
+        return self.all_predict_tensors.get_all_params()
 
