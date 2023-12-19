@@ -102,8 +102,8 @@ def unsqueeze_tensors(tensors:Dict[str,torch.Tensor],max_dim=None):
 class TorchPlus:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
     meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-5})
-    meta_optimizer_epoch : int = 2000
-    meta_optimizer_data_per_iteration : int = 1
+    meta_epoch : int = 2000
+    meta_data_per_iteration : int = 1
     meta_error_measurement : Any = torch.nn.MSELoss()
     meta_activator : Callable = field(default_factory=nn.LeakyReLU)
     
@@ -126,7 +126,7 @@ class TorchPlus:
     def train(self):
         #filter current sequence => unify dimensions => cals
 
-        for _ in range(self.meta_optimizer_epoch):
+        for _ in range(self.meta_epoch):
             for pred_tensors,lab_tensors in zip(self.all_predict_tensors,self.all_label_tensors):
                 pred_unsqueezed,max_dim = unsqueeze_tensors(pred_tensors)
                 lab_unsqueezed,_ = unsqueeze_tensors(lab_tensors,max_dim)
