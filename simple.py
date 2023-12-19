@@ -30,17 +30,22 @@ class TorchPlus:
 
     def train(self):
         #filter current sequence => unify dimensions => cals
+        self._current_mode = ProcessMode.ASSIGN
+        pred = self.assign_process_prediction(self.meta_activator)
+        self._current_mode = ProcessMode.PROCESS
 
         for _ in range(self.meta_epoch):
             for pred_tensors,lab_tensors in zip(self.all_predict_tensors,self.all_label_tensors):
-                pred_unsqueezed,max_dim = unsqueeze_tensors(pred_tensors)
-                lab_unsqueezed,_ = unsqueeze_tensors(lab_tensors,max_dim)
-                pred = self.assign_process_prediction(pred_unsqueezed,self.meta_activator)
-                loss = self.train_one_step_by_equation([value for value in lab_unsqueezed.values()][0],pred)
+                self._pred_unsqueezed,max_dim = unsqueeze_tensors(pred_tensors)
+                self._lab_unsqueezed,_ = unsqueeze_tensors(lab_tensors,max_dim)
+
+                pred = self.assign_process_prediction(self.meta_activator)
+                loss = self.train_one_step_by_equation([value for value in self._lab_unsqueezed.values()][0],pred)
                 
         return lambda **kwarg: self.predict(**kwarg)
     
     def predict(self,**kwarg):
+        self._current_mode = ProcessMode.PROCESS
 
         for key in kwarg:
             self.all_predict_tensors.change_tensor(key,kwarg[key])
@@ -48,8 +53,33 @@ class TorchPlus:
         
         ret = []
         for pred_tensors in self.all_predict_tensors:
-            pred_unsqueezed,_ = unsqueeze_tensors(pred_tensors)
-            pred = self.assign_process_prediction(pred_unsqueezed,self.meta_activator)
+            self._pred_unsqueezed,_ = unsqueeze_tensors(pred_tensors)
+
+            self._current_mode = ProcessMode.PROCESS
+            pred = self.assign_process_prediction(self.meta_activator)
             ret.append(pred)
         
         return ret
+    
+    def input(self:Self,name:str,tensor:torch.Tensor):
+        if self._current_mode == ProcessMode.ASSIGN:
+            self.all_predict_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.DEFAULT,axis_sequence=0),tensor)
+            return tensor
+        elif self._current_mode == ProcessMode.PROCESS:
+            return self._pred_unsqueezed[name] 
+
+    def parameter(self:Self,name:str,tensor:torch.Tensor):
+        if self._current_mode == ProcessMode.ASSIGN:
+            self.all_predict_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.PARAMETER,axis_sequence=-1),tensor)
+            return tensor
+        elif self._current_mode == ProcessMode.PROCESS:
+            return self._pred_unsqueezed[name] 
+
+    def label(self:Self,name:str,tensor:torch.Tensor):
+        if self._current_mode == ProcessMode.ASSIGN:
+            self.all_label_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.DEFAULT,axis_sequence=0),tensor)
+            return tensor
+        elif self._current_mode == ProcessMode.PROCESS:
+            return self._lab_unsqueezed[name] 
+
+

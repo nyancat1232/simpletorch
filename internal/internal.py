@@ -11,11 +11,12 @@ class TTPType(Enum):
     PARAMETER = 2
 
 
-#default tensor's axis_sequence => 0 if train, -1 if predict
-#default tensor's tensor => ? if train, ? if predict
+class ProcessMode(Enum):
+    ASSIGN = 1
+    PROCESS = 2
 
 @dataclass
-class TorchTensorPlus():
+class TorchTensorPlusInternal():
     '''
     (description)
     ## Parameters:
@@ -57,7 +58,7 @@ class TorchTensorPlus():
 @dataclass
 class TensorsSquence:
     _tensor_name : List[str] = field(repr=False,init=False)
-    _tensors : List[TorchTensorPlus] = field(repr=False,init=False)
+    _tensors : List[TorchTensorPlusInternal] = field(repr=False,init=False)
 
     def __post_init__(self):
         self._tensor_name = []
@@ -66,7 +67,7 @@ class TensorsSquence:
     def __getitem__(self,sequence_ind):
         return {self._tensor_name[index] : self._tensors[index][sequence_ind] for index,_ in enumerate(self._tensor_name)}
     
-    def new_tensor(self,name,tensorplus:TorchTensorPlus,tensor:torch.Tensor):
+    def new_tensor(self,name,tensorplus:TorchTensorPlusInternal,tensor:torch.Tensor):
         self._tensor_name.append(name)
         current_ttp = tensorplus
         current_ttp.tensor = tensor
