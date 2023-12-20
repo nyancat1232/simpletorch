@@ -67,7 +67,6 @@ class TorchTensorPlusInternal(TorchTensorPlusInternalSequenced):
 
 @dataclass
 class TensorsSquence:
-    _tensor_name : List[str] = field(repr=False,init=False)
     _tensors : List[TorchTensorPlusInternal] = field(repr=False,init=False)
 
     def __post_init__(self):
