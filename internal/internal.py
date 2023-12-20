@@ -81,9 +81,9 @@ class TensorsSquence:
         self._tensors.append(current_ttp) 
 
     def change_tensor(self,name,tensor:torch.Tensor):
-        for current_name_index,current_name in enumerate([tensor.name for tensor in self._tensors]):
-            if current_name == name:
-                self._tensors[current_name_index].tensor = tensor
+        for current_tensor in self._tensors:
+            if current_tensor.name == name:
+                current_tensor.tensor = tensor
     
     def get_all_params(self):
         return {tensor.name :tensor.tensor for tensor in self._tensors if tensor.ttype == TTPType.PARAMETER}
