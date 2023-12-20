@@ -67,29 +67,27 @@ class TensorInternal(TensorInternalSequenced):
 
 @dataclass
 class TensorsManagerSequenced:
-    _tensors : List[TensorInternal] = field(repr=False,init=False)
-
-    def __post_init__(self):
-        self._tensors = []
+    tensors : List[TensorInternal] = field(default_factory=list)
 
     def new_tensor(self,name:str,ttype:TTPType,axis_sequence:int,tensor:torch.Tensor):
         current_ttp = TensorInternal(name=name,ttype=ttype,axis_sequence=axis_sequence)
         current_ttp.tensor = tensor
-        self._tensors.append(current_ttp) 
+        self.tensors.append(current_ttp) 
 
     def change_tensor(self,name,tensor:torch.Tensor):
-        for current_tensor in self._tensors:
+        for current_tensor in self.tensors:
             if current_tensor.name == name:
                 current_tensor.tensor = tensor
     def get_all_params(self):
-        return {tensor.name :tensor.tensor for tensor in self._tensors if tensor.ttype == TTPType.PARAMETER}
+        return {tensor.name :tensor.tensor for tensor in self.tensors if tensor.ttype == TTPType.PARAMETER}
 
 
 @dataclass
 class TensorsManager(TensorsManagerSequenced):
 
     def __getitem__(self,sequence_ind) ->Dict[str,TensorInternalSequenced]:
-        return [tensor[sequence_ind] for tensor in self._tensors]
+        
+        return [tensor[sequence_ind] for tensor in self.tensors]
     
     
 
