@@ -75,8 +75,8 @@ class TensorsSquence:
     def __getitem__(self,sequence_ind) ->Dict[str,TorchTensorPlusInternalSequenced]:
         return [self._tensors[index][sequence_ind] for index,_ in enumerate(self._tensors)]
     
-    def new_tensor(self,tensorplus:TorchTensorPlusInternal,tensor:torch.Tensor):
-        current_ttp = tensorplus
+    def new_tensor(self,name:str,ttype:TTPType,axis_sequence:int,tensor:torch.Tensor):
+        current_ttp = TorchTensorPlusInternal(name=name,ttype=ttype,axis_sequence=axis_sequence)
         current_ttp.tensor = tensor
         self._tensors.append(current_ttp) 
 

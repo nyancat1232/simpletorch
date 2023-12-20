@@ -73,21 +73,21 @@ class TorchPlus:
     
     def input(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0):
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_predict_tensors.new_tensor(TorchTensorPlusInternal(name=name,ttype=TTPType.DEFAULT,axis_sequence=axis_sequence),tensor)
+            self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.DEFAULT,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._pred_unsqueezed[name].tensor 
 
     def parameter(self:Self,name:str,tensor:torch.Tensor,axis_sequence=-1):
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_predict_tensors.new_tensor(TorchTensorPlusInternal(name=name,ttype=TTPType.PARAMETER,axis_sequence=axis_sequence),tensor)
+            self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.PARAMETER,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._pred_unsqueezed[name].tensor 
 
     def label(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0):
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_label_tensors.new_tensor(TorchTensorPlusInternal(name=name,ttype=TTPType.DEFAULT,axis_sequence=axis_sequence),tensor)
+            self.all_label_tensors.new_tensor(name=name,ttype=TTPType.DEFAULT,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._lab_unsqueezed[name].tensor  
