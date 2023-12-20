@@ -78,6 +78,12 @@ class TensorsManagerSequenced:
         for current_tensor in self.tensors:
             if current_tensor.name == name:
                 current_tensor.tensor = tensor
+
+    def get_tensor(self,name) -> TensorInternal:
+        for current_tensor in self.tensors:
+            if current_tensor.name == name:
+                return current_tensor
+
     def get_all_params(self):
         return {tensor.name :tensor.tensor for tensor in self.tensors if tensor.ttype == TTPType.PARAMETER}
 
