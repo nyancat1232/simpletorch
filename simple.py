@@ -26,7 +26,7 @@ class TorchPlus:
         self._assign_process_prediction = function
 
 
-    def _train_one_step_by_equation(self,label,prediction_quation):
+    def _train_one_step_by_equation(self,label:torch.Tensor,prediction_quation:torch.Tensor):
         optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
         
