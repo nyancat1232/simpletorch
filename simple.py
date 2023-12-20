@@ -30,19 +30,18 @@ class TorchPlus:
         optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
         
-        loss = self.meta_error_measurement(label,  prediction_quation)
+        loss = self.meta_error_measurement(label.tensor,  prediction_quation)
         loss.backward()
         optim.step()
         optim.zero_grad()
 
         return loss
 
-    def train(self,show_progress=True):
+    def train(self,show_progress=False):
         #filter current sequence => unify dimensions => cals
         self._current_mode = ProcessMode.ASSIGN
         self._assign_process_prediction(self.meta_activator)
         self._current_mode = ProcessMode.PROCESS
-
         for _ in range(self.meta_epoch):
             for pred_tensors,lab_tensors in zip(self.all_predict_tensors,self.all_label_tensors):
                 if show_progress:
@@ -74,24 +73,24 @@ class TorchPlus:
     
     def input(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0):
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_predict_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.DEFAULT,axis_sequence=axis_sequence),tensor)
+            self.all_predict_tensors.new_tensor(TorchTensorPlusInternal(name=name,ttype=TTPType.DEFAULT,axis_sequence=axis_sequence),tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
-            return self._pred_unsqueezed[name] 
+            return self._pred_unsqueezed[name].tensor 
 
     def parameter(self:Self,name:str,tensor:torch.Tensor,axis_sequence=-1):
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_predict_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.PARAMETER,axis_sequence=axis_sequence),tensor)
+            self.all_predict_tensors.new_tensor(TorchTensorPlusInternal(name=name,ttype=TTPType.PARAMETER,axis_sequence=axis_sequence),tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
-            return self._pred_unsqueezed[name] 
+            return self._pred_unsqueezed[name].tensor 
 
     def label(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0):
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_label_tensors.new_tensor(name,TorchTensorPlusInternal(ttype=TTPType.DEFAULT,axis_sequence=axis_sequence),tensor)
+            self.all_label_tensors.new_tensor(TorchTensorPlusInternal(name=name,ttype=TTPType.DEFAULT,axis_sequence=axis_sequence),tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
-            return self._lab_unsqueezed[name] 
+            return self._lab_unsqueezed[name].tensor  
 
     def get_parameters(self:Self)->Dict:
         return self.all_predict_tensors.get_all_params()
