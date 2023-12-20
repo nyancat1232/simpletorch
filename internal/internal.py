@@ -66,15 +66,12 @@ class TensorInternal(TensorInternalSequenced):
 #input => sequence, parameter=> nonsequence, default=> not used 
 
 @dataclass
-class TensorsManager:
+class TensorsManagerSequenced:
     _tensors : List[TensorInternal] = field(repr=False,init=False)
 
     def __post_init__(self):
         self._tensors = []
 
-    def __getitem__(self,sequence_ind) ->Dict[str,TensorInternalSequenced]:
-        return [tensor[sequence_ind] for tensor in self._tensors]
-    
     def new_tensor(self,name:str,ttype:TTPType,axis_sequence:int,tensor:torch.Tensor):
         current_ttp = TensorInternal(name=name,ttype=ttype,axis_sequence=axis_sequence)
         current_ttp.tensor = tensor
@@ -84,9 +81,17 @@ class TensorsManager:
         for current_tensor in self._tensors:
             if current_tensor.name == name:
                 current_tensor.tensor = tensor
-    
     def get_all_params(self):
         return {tensor.name :tensor.tensor for tensor in self._tensors if tensor.ttype == TTPType.PARAMETER}
+
+
+@dataclass
+class TensorsManager(TensorsManagerSequenced):
+
+    def __getitem__(self,sequence_ind) ->Dict[str,TensorInternalSequenced]:
+        return [tensor[sequence_ind] for tensor in self._tensors]
+    
+    
 
 
 def unsqueeze_tensors(tensors:Dict[str,TensorInternalSequenced],max_dim=None):
