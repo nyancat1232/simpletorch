@@ -37,7 +37,7 @@ class TorchPlus:
 
         return loss
 
-    def train(self,show_sequence_process=False,show_epoch_process=False):
+    def train(self,show_every_iteration=False):
         #filter current sequence => unify dimensions => cals
         self._current_mode = ProcessMode.ASSIGN
         self._assign_process_prediction(self.meta_activator)
@@ -49,10 +49,6 @@ class TorchPlus:
                 pred_tensors = self.all_predict_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
                 lab_tensors = self.all_label_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
 
-                if show_sequence_process:
-                    print(f'current data : {sequence_ind} to {sequence_ind+self.meta_data_per_iteration}')
-                    #print([t.tensor for t in pred_tensors.tensors],[t.tensor for t in lab_tensors.tensors])
-
                 self._pred_unsqueezed,max_dim = pred_tensors.unsqueeze_tensors()
                 self._lab_unsqueezed,_ = lab_tensors.unsqueeze_tensors(max_dim)
 
@@ -60,8 +56,8 @@ class TorchPlus:
                 loss = self._train_one_step_by_equation(self._lab_unsqueezed.tensors[0].tensor,pred)
 
             
-            if show_epoch_process:
-                print(f'current epoch : {epoch}')
+                if show_every_iteration:
+                    print(f'Epoch : {epoch}/{self.meta_epoch}\tIteration : {sequence_ind}/{min_sequence}\tLoss : {loss}')
                 
         return lambda **kwarg: self.predict(**kwarg)
     
