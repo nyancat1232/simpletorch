@@ -92,8 +92,7 @@ class TensorsManagerSequenced:
     def unsqueeze_tensors(self,max_dim=None):
         if max_dim is None:
             max_dim = self.get_max_dim()
-
-        return {tensor.name : tensor.unsqueeze_to(max_dim) for tensor in self.tensors},max_dim
+        return TensorsManagerSequenced([tensor.unsqueeze_to(max_dim) for tensor in self.tensors]),max_dim
 
         
 

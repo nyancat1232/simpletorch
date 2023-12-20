@@ -30,7 +30,7 @@ class TorchPlus:
         optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
         
-        loss = self.meta_error_measurement(label.tensor,  prediction_quation)
+        loss = self.meta_error_measurement(label,  prediction_quation)
         loss.backward()
         optim.step()
         optim.zero_grad()
@@ -50,7 +50,7 @@ class TorchPlus:
                 self._lab_unsqueezed,_ = lab_tensors.unsqueeze_tensors(max_dim)
 
                 pred = self._assign_process_prediction(self.meta_activator)
-                loss = self._train_one_step_by_equation([value for value in self._lab_unsqueezed.values()][0],pred)
+                loss = self._train_one_step_by_equation(self._lab_unsqueezed.tensors[0].tensor,pred)
                 
         return lambda **kwarg: self.predict(**kwarg)
     
@@ -76,21 +76,21 @@ class TorchPlus:
             self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.DEFAULT,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
-            return self._pred_unsqueezed[name].tensor 
+            return self._pred_unsqueezed.get_tensor(name).tensor 
 
     def parameter(self:Self,name:str,tensor:torch.Tensor,axis_sequence=-1):
         if self._current_mode == ProcessMode.ASSIGN:
             self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.PARAMETER,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
-            return self._pred_unsqueezed[name].tensor 
+            return self._pred_unsqueezed.get_tensor(name).tensor 
 
     def label(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0):
         if self._current_mode == ProcessMode.ASSIGN:
             self.all_label_tensors.new_tensor(name=name,ttype=TTPType.DEFAULT,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
-            return self._lab_unsqueezed[name].tensor  
+            return self._lab_unsqueezed.get_tensor(name).tensor 
 
     def get_parameters(self:Self)->Dict:
         return self.all_predict_tensors.get_all_params()
