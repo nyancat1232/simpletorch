@@ -46,8 +46,8 @@ class TorchPlus:
             for pred_tensors,lab_tensors in zip(self.all_predict_tensors,self.all_label_tensors):
                 if show_progress:
                     print(pred_tensors)
-                self._pred_unsqueezed,max_dim = unsqueeze_tensors(pred_tensors)
-                self._lab_unsqueezed,_ = unsqueeze_tensors(lab_tensors,max_dim)
+                self._pred_unsqueezed,max_dim = pred_tensors.unsqueeze_tensors()
+                self._lab_unsqueezed,_ = lab_tensors.unsqueeze_tensors(max_dim)
 
                 pred = self._assign_process_prediction(self.meta_activator)
                 loss = self._train_one_step_by_equation([value for value in self._lab_unsqueezed.values()][0],pred)
@@ -63,7 +63,7 @@ class TorchPlus:
         
         ret = []
         for pred_tensors in self.all_predict_tensors:
-            self._pred_unsqueezed,_ = unsqueeze_tensors(pred_tensors)
+            self._pred_unsqueezed,_ = pred_tensors.unsqueeze_tensors()
 
             self._current_mode = ProcessMode.PROCESS
             pred = self._assign_process_prediction(self.meta_activator)

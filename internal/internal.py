@@ -81,21 +81,20 @@ class TensorsManagerSequenced:
     def get_all_params(self):
         return {tensor.name :tensor.tensor for tensor in self.tensors if tensor.ttype == TTPType.PARAMETER}
 
+    def unsqueeze_tensors(self,max_dim=None):
+        if max_dim is None:
+            max_dim = max([tensor.tensor.dim() for tensor in self.tensors])
+
+        return {tensor.name : tensor.unsqueeze_to(max_dim) for tensor in self.tensors},max_dim
+
+        
+
 
 @dataclass
 class TensorsManager(TensorsManagerSequenced):
 
-    def __getitem__(self,sequence_ind) ->Dict[str,TensorInternalSequenced]:
-        
-        return [tensor[sequence_ind] for tensor in self.tensors]
+    def __getitem__(self,sequence_ind) ->TensorsManagerSequenced:
+        ret = TensorsManagerSequenced([tensor[sequence_ind] for tensor in self.tensors])
+        return ret
     
     
-
-
-def unsqueeze_tensors(tensors:Dict[str,TensorInternalSequenced],max_dim=None):
-    if max_dim is None:
-        max_dim = max([tensors[key].tensor.dim() for key,_ in enumerate(tensors)])
-
-    return {tensors[key].name : tensors[key].unsqueeze_to(max_dim) for key,_ in enumerate(tensors)},max_dim
-
-        
