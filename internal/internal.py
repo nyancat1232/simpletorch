@@ -16,7 +16,7 @@ class ProcessMode(Enum):
     PROCESS = 2
 
 @dataclass
-class TorchTensorPlusInternalSequencedUnsqeezed:
+class TensorInternalSequencedUnsqeezed:
     name : str
     ttype : TTPType
     _tensor : torch.Tensor = field(repr=False,init=False)
@@ -31,9 +31,9 @@ class TorchTensorPlusInternalSequencedUnsqeezed:
         return self._tensor
 
 @dataclass
-class TorchTensorPlusInternalSequenced(TorchTensorPlusInternalSequencedUnsqeezed):
+class TensorInternalSequenced(TensorInternalSequencedUnsqeezed):
     def unsqueeze_to(self,dim):
-        ret = TorchTensorPlusInternalSequencedUnsqeezed(name=self.name,ttype=self.ttype)
+        ret = TensorInternalSequencedUnsqeezed(name=self.name,ttype=self.ttype)
         current_dim = self.tensor.dim()
         for _ in range(dim-current_dim):
             ret.tensor = self.tensor.unsqueeze(0)
@@ -44,16 +44,16 @@ class TorchTensorPlusInternalSequenced(TorchTensorPlusInternalSequencedUnsqeezed
         return ret
 
 @dataclass
-class TorchTensorPlusInternal(TorchTensorPlusInternalSequenced):
+class TensorInternal(TensorInternalSequenced):
     axis_sequence : int = -1
         
-    def __getitem__(self,key) ->TorchTensorPlusInternalSequenced:
+    def __getitem__(self,key) ->TensorInternalSequenced:
         if self.axis_sequence == 0:
-            ret = TorchTensorPlusInternalSequenced(self.name,self.ttype)
+            ret = TensorInternalSequenced(self.name,self.ttype)
             ret.tensor = self.tensor[key]
             return ret
         elif self.axis_sequence <0 :
-            ret = TorchTensorPlusInternalSequenced(self.name,self.ttype)
+            ret = TensorInternalSequenced(self.name,self.ttype)
             ret.tensor = self.tensor
             return ret
         else:
@@ -67,16 +67,16 @@ class TorchTensorPlusInternal(TorchTensorPlusInternalSequenced):
 
 @dataclass
 class TensorsSquence:
-    _tensors : List[TorchTensorPlusInternal] = field(repr=False,init=False)
+    _tensors : List[TensorInternal] = field(repr=False,init=False)
 
     def __post_init__(self):
         self._tensors = []
 
-    def __getitem__(self,sequence_ind) ->Dict[str,TorchTensorPlusInternalSequenced]:
+    def __getitem__(self,sequence_ind) ->Dict[str,TensorInternalSequenced]:
         return [tensor[sequence_ind] for tensor in self._tensors]
     
     def new_tensor(self,name:str,ttype:TTPType,axis_sequence:int,tensor:torch.Tensor):
-        current_ttp = TorchTensorPlusInternal(name=name,ttype=ttype,axis_sequence=axis_sequence)
+        current_ttp = TensorInternal(name=name,ttype=ttype,axis_sequence=axis_sequence)
         current_ttp.tensor = tensor
         self._tensors.append(current_ttp) 
 
@@ -89,7 +89,7 @@ class TensorsSquence:
         return {tensor.name :tensor.tensor for tensor in self._tensors if tensor.ttype == TTPType.PARAMETER}
 
 
-def unsqueeze_tensors(tensors:Dict[str,TorchTensorPlusInternalSequenced],max_dim=None):
+def unsqueeze_tensors(tensors:Dict[str,TensorInternalSequenced],max_dim=None):
     if max_dim is None:
         max_dim = max([tensors[key].tensor.dim() for key,_ in enumerate(tensors)])
 
