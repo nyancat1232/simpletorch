@@ -12,8 +12,8 @@ class TorchPlus:
     meta_error_measurement : Any = torch.nn.MSELoss()
     meta_activator : Callable = field(default_factory=nn.LeakyReLU)
     
-    all_predict_tensors : TensorsSquence = field(init=False,default_factory=TensorsSquence)
-    all_label_tensors : TensorsSquence = field(init=False,default_factory=TensorsSquence)
+    all_predict_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
+    all_label_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
 
     _assign_process_prediction : Callable = None
     

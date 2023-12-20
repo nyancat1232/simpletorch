@@ -66,7 +66,7 @@ class TensorInternal(TensorInternalSequenced):
 #input => sequence, parameter=> nonsequence, default=> not used 
 
 @dataclass
-class TensorsSquence:
+class TensorsManager:
     _tensors : List[TensorInternal] = field(repr=False,init=False)
 
     def __post_init__(self):
