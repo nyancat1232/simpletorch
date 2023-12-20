@@ -45,14 +45,13 @@ class TorchPlus:
         for _ in range(self.meta_epoch):
             min_sequence = min(self.all_predict_tensors.get_min_sequence_length(TTPType.INPUT),self.all_label_tensors.get_min_sequence_length(TTPType.DEFAULT))
 
-            for sequence_ind in range(min_sequence):
-                pred_tensors = self.all_predict_tensors[sequence_ind]
-                lab_tensors = self.all_label_tensors[sequence_ind]
+            for sequence_ind in range(0,min_sequence,self.meta_data_per_iteration):
+                pred_tensors = self.all_predict_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
+                lab_tensors = self.all_label_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
 
                 if show_progress:
-                    print(min_sequence)
-                    print(pred_tensors)
-                    
+                    print(pred_tensors.get_tensor('input').tensor,lab_tensors.get_tensor('label').tensor)
+
                 self._pred_unsqueezed,max_dim = pred_tensors.unsqueeze_tensors()
                 self._lab_unsqueezed,_ = lab_tensors.unsqueeze_tensors(max_dim)
 
