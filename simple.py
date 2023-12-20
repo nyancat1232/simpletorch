@@ -71,14 +71,15 @@ class TorchPlus:
         for key in kwarg:
             self.all_predict_tensors.change_tensor(key,kwarg[key])
         
-        
-        ret = []
-        for pred_tensors in self.all_predict_tensors:
-            self._pred_unsqueezed,_ = pred_tensors.unsqueeze_tensors()
+        min_sequence = self.all_predict_tensors.get_min_sequence_length(TTPType.INPUT)
 
-            self._current_mode = ProcessMode.PROCESS
+        ret = []
+        for sequence_ind in range(0,min_sequence):
+            pred_tensors = self.all_predict_tensors[sequence_ind]
+            self._pred_unsqueezed,_ = pred_tensors.unsqueeze_tensors()
             pred = self._assign_process_prediction(self.meta_activator)
             ret.append(pred)
+
         
         return ret
     
