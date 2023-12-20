@@ -43,9 +43,16 @@ class TorchPlus:
         self._assign_process_prediction(self.meta_activator)
         self._current_mode = ProcessMode.PROCESS
         for _ in range(self.meta_epoch):
-            for pred_tensors,lab_tensors in zip(self.all_predict_tensors,self.all_label_tensors):
+            min_sequence = min(self.all_predict_tensors.get_min_sequence_length(TTPType.INPUT),self.all_label_tensors.get_min_sequence_length(TTPType.DEFAULT))
+
+            for sequence_ind in range(min_sequence):
+                pred_tensors = self.all_predict_tensors[sequence_ind]
+                lab_tensors = self.all_label_tensors[sequence_ind]
+
                 if show_progress:
+                    print(min_sequence)
                     print(pred_tensors)
+                    
                 self._pred_unsqueezed,max_dim = pred_tensors.unsqueeze_tensors()
                 self._lab_unsqueezed,_ = lab_tensors.unsqueeze_tensors(max_dim)
 
