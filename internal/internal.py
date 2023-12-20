@@ -94,6 +94,8 @@ class TensorsManagerSequenced:
             max_dim = self.get_max_dim()
         return TensorsManagerSequenced([tensor.unsqueeze_to(max_dim) for tensor in self.tensors]),max_dim
 
+    def get_min_sequence_length(self,type):
+        return min([len(tensor.tensor) for tensor in self.tensors if tensor.ttype == type])
         
 
 
