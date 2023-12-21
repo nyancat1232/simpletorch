@@ -15,17 +15,6 @@ class TorchPlus:
     all_predict_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
     all_label_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
 
-    _assign_process_prediction : Callable = None
-    
-    @property
-    def process(self):
-        return self._assign_process_prediction
-
-    @process.setter
-    def process(self,function:Callable):
-        self._assign_process_prediction = function
-
-
     def _train_one_step_by_equation(self,label:torch.Tensor,prediction_quation:torch.Tensor):
         optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
@@ -40,7 +29,7 @@ class TorchPlus:
     def train(self,show_every_iteration=False):
         #filter current sequence => unify dimensions => cals
         self._current_mode = ProcessMode.ASSIGN
-        self._assign_process_prediction()
+        self.process()
         self._current_mode = ProcessMode.PROCESS
         for epoch in range(self.meta_epoch):
             min_sequence = min(self.all_predict_tensors.get_min_sequence_length(TTPType.INPUT),self.all_label_tensors.get_min_sequence_length(TTPType.DEFAULT))
@@ -52,7 +41,7 @@ class TorchPlus:
                 self._pred_unsqueezed,max_dim = pred_tensors.unsqueeze_tensors()
                 self._lab_unsqueezed,_ = lab_tensors.unsqueeze_tensors(max_dim)
 
-                pred = self._assign_process_prediction()
+                pred = self.process()
                 loss = self._train_one_step_by_equation(self._lab_unsqueezed.tensors[0].tensor,pred)
 
             
@@ -73,7 +62,7 @@ class TorchPlus:
         for sequence_ind in range(0,min_sequence):
             pred_tensors = self.all_predict_tensors[sequence_ind]
             self._pred_unsqueezed,_ = pred_tensors.unsqueeze_tensors()
-            pred = self._assign_process_prediction()
+            pred = self.process()
             ret.append(pred)
 
         
