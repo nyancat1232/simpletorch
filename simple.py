@@ -44,10 +44,8 @@ class TorchPlus:
             min_sequence = min(self.all_predict_tensors.get_min_sequence_length(TTPType.INPUT),self.all_label_tensors.get_min_sequence_length(TTPType.DEFAULT))
 
             for sequence_ind in range(0,min_sequence,self.meta_data_per_iteration):
-                pred_tensors = self.all_predict_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
+                self._current_tensors_prediction = self.all_predict_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
                 lab_tensors = self.all_label_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
-
-                self._pred_unsqueezed,max_dim = pred_tensors.unsqueeze_tensors()
 
                 pred = self.process()
                 loss = self._train_one_step_by_equation(lab_tensors.tensors[0].tensor,pred)
@@ -68,8 +66,7 @@ class TorchPlus:
 
         ret = []
         for sequence_ind in range(0,min_sequence):
-            pred_tensors = self.all_predict_tensors[sequence_ind]
-            self._pred_unsqueezed,_ = pred_tensors.unsqueeze_tensors()
+            self._current_tensors_prediction = self.all_predict_tensors[sequence_ind]
             pred = self.process()
             ret.append(pred)
 
@@ -81,14 +78,14 @@ class TorchPlus:
             self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.INPUT,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
-            return self._pred_unsqueezed.get_tensor(name).tensor 
+            return self._current_tensors_prediction.get_tensor(name).tensor 
 
     def parameter(self:Self,name:str,tensor:torch.Tensor,axis_sequence=-1)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
             self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.PARAMETER,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
-            return self._pred_unsqueezed.get_tensor(name).tensor 
+            return self._current_tensors_prediction.get_tensor(name).tensor 
 
     def label(self:Self,tensor:torch.Tensor,axis_sequence=0)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
