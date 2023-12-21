@@ -1,6 +1,7 @@
 from pyplus.pytorch.internal.internal import *
 from typing import Dict
 
+#works on pytorch 2.1.1
 
 #https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
 @dataclass
