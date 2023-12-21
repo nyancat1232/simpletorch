@@ -17,6 +17,13 @@ class TorchPlus:
     def __post_init__(self):
         if not hasattr(self, 'process'):
             raise NotImplementedError("Please, override \ndef process(self):\n\n function in this class.")
+        
+        self._current_mode = ProcessMode.ASSIGN
+        self.process()
+        self._current_mode = ProcessMode.PROCESS
+        
+        if self.all_label_tensors.is_empty():
+            raise NotImplementedError('Please, set labels by using \n self.label(..) \n in "def process(self):".')
 
     def _train_one_step_by_equation(self,label:torch.Tensor,prediction_quation:torch.Tensor):
         optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
@@ -31,9 +38,7 @@ class TorchPlus:
 
     def train(self,show_every_iteration=False):
         #filter current sequence => unify dimensions => cals
-        self._current_mode = ProcessMode.ASSIGN
-        self.process()
-        self._current_mode = ProcessMode.PROCESS
+
         for epoch in range(self.meta_epoch):
             min_sequence = min(self.all_predict_tensors.get_min_sequence_length(TTPType.INPUT),self.all_label_tensors.get_min_sequence_length(TTPType.DEFAULT))
 

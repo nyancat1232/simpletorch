@@ -106,4 +106,10 @@ class TensorsManager(TensorsManagerSequenced):
         ret = TensorsManagerSequenced([tensor[sequence_ind] for tensor in self.tensors])
         return ret
     
+    def is_empty(self):
+        if len(self.tensors) > 0:
+            return False
+        else:
+            return True
+    
     
