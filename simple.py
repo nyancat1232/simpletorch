@@ -9,7 +9,7 @@ class TorchPlus:
     meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-4})
     meta_epoch : int = 3000
     meta_data_per_iteration : int = 1
-    meta_error_measurement : Any = torch.nn.MSELoss()
+    meta_error_measurement : Any = torch.nn.MSELoss
     #meta_activator : Callable = field(default_factory=nn.LeakyReLU)
     
     all_predict_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
@@ -30,7 +30,7 @@ class TorchPlus:
         optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
         
-        loss = self.meta_error_measurement(label,  prediction_quation)
+        loss = self.meta_error_measurement()(label,  prediction_quation)
         loss.backward()
         optim.step()
         optim.zero_grad()
