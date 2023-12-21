@@ -10,7 +10,7 @@ class TorchPlus:
     meta_epoch : int = 3000
     meta_data_per_iteration : int = 1
     meta_error_measurement : Any = torch.nn.MSELoss()
-    meta_activator : Callable = field(default_factory=nn.LeakyReLU)
+    #meta_activator : Callable = field(default_factory=nn.LeakyReLU)
     
     all_predict_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
     all_label_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
@@ -40,7 +40,7 @@ class TorchPlus:
     def train(self,show_every_iteration=False):
         #filter current sequence => unify dimensions => cals
         self._current_mode = ProcessMode.ASSIGN
-        self._assign_process_prediction(self.meta_activator)
+        self._assign_process_prediction()
         self._current_mode = ProcessMode.PROCESS
         for epoch in range(self.meta_epoch):
             min_sequence = min(self.all_predict_tensors.get_min_sequence_length(TTPType.INPUT),self.all_label_tensors.get_min_sequence_length(TTPType.DEFAULT))
@@ -52,7 +52,7 @@ class TorchPlus:
                 self._pred_unsqueezed,max_dim = pred_tensors.unsqueeze_tensors()
                 self._lab_unsqueezed,_ = lab_tensors.unsqueeze_tensors(max_dim)
 
-                pred = self._assign_process_prediction(self.meta_activator)
+                pred = self._assign_process_prediction()
                 loss = self._train_one_step_by_equation(self._lab_unsqueezed.tensors[0].tensor,pred)
 
             
@@ -73,7 +73,7 @@ class TorchPlus:
         for sequence_ind in range(0,min_sequence):
             pred_tensors = self.all_predict_tensors[sequence_ind]
             self._pred_unsqueezed,_ = pred_tensors.unsqueeze_tensors()
-            pred = self._assign_process_prediction(self.meta_activator)
+            pred = self._assign_process_prediction()
             ret.append(pred)
 
         
