@@ -15,6 +15,10 @@ class TorchPlus:
     all_predict_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
     all_label_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
 
+    def __post_init__(self):
+        if not hasattr(self, 'process'):
+            raise NotImplementedError("Please, override \ndef process(self):\n\n function in this class.")
+
     def _train_one_step_by_equation(self,label:torch.Tensor,prediction_quation:torch.Tensor):
         optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
         optim.zero_grad()
