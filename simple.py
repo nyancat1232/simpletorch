@@ -77,21 +77,21 @@ class TorchPlus:
         
         return ret
     
-    def input(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0):
+    def input(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
             self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.INPUT,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._pred_unsqueezed.get_tensor(name).tensor 
 
-    def parameter(self:Self,name:str,tensor:torch.Tensor,axis_sequence=-1):
+    def parameter(self:Self,name:str,tensor:torch.Tensor,axis_sequence=-1)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
             self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.PARAMETER,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._pred_unsqueezed.get_tensor(name).tensor 
 
-    def label(self:Self,tensor:torch.Tensor,axis_sequence=0):
+    def label(self:Self,tensor:torch.Tensor,axis_sequence=0)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
             self.all_label_tensors.new_tensor(ttype=TTPType.DEFAULT,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
