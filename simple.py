@@ -10,7 +10,6 @@ class TorchPlus:
     meta_epoch : int = 3000
     meta_data_per_iteration : int = 1
     meta_error_measurement : Any = torch.nn.MSELoss
-    #meta_activator : Callable = field(default_factory=nn.LeakyReLU)
     
     all_predict_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
     all_label_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
