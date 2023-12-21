@@ -48,10 +48,9 @@ class TorchPlus:
                 lab_tensors = self.all_label_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
 
                 self._pred_unsqueezed,max_dim = pred_tensors.unsqueeze_tensors()
-                self._lab_unsqueezed,_ = lab_tensors.unsqueeze_tensors(max_dim)
 
                 pred = self.process()
-                loss = self._train_one_step_by_equation(self._lab_unsqueezed.tensors[0].tensor,pred)
+                loss = self._train_one_step_by_equation(lab_tensors.tensors[0].tensor,pred)
 
             
                 if show_every_iteration:
