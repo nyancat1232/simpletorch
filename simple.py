@@ -93,9 +93,9 @@ class TorchPlus:
         elif self._current_mode == ProcessMode.PROCESS:
             return self._pred_unsqueezed.get_tensor(name).tensor 
 
-    def label(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0):
+    def label(self:Self,tensor:torch.Tensor,axis_sequence=0):
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_label_tensors.new_tensor(name=name,ttype=TTPType.DEFAULT,axis_sequence=axis_sequence,tensor=tensor)
+            self.all_label_tensors.new_tensor(ttype=TTPType.DEFAULT,axis_sequence=axis_sequence,tensor=tensor)
             return tensor
 
     def get_parameters(self:Self)->Dict:

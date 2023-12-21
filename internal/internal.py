@@ -69,7 +69,7 @@ class TensorInternal(TensorInternalSequenced):
 class TensorsManagerSequenced:
     tensors : List[TensorInternal] = field(default_factory=list)
 
-    def new_tensor(self,name:str,ttype:TTPType,axis_sequence:int,tensor:torch.Tensor):
+    def new_tensor(self,tensor:torch.Tensor,ttype:TTPType,axis_sequence:int,name:str=None):
         current_ttp = TensorInternal(name=name,ttype=ttype,axis_sequence=axis_sequence)
         current_ttp.tensor = tensor
         self.tensors.append(current_ttp) 
