@@ -79,10 +79,14 @@ class TorchPlus:
         
         return ret
     
-    def input(self:Self,data:List,name:str,axis_sequence=0)->torch.Tensor:
+    def input(self:Self,data:List,meta_data_type:MetaDataType,name:str,axis_sequence=0)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
             new_tensor=torch.FloatTensor(data)
-            self.all_predict_tensors.new_tensor(name=name,ttype=MetaTensorType.INPUT,axis_sequence=axis_sequence,tensor=new_tensor)
+            self.all_predict_tensors.new_tensor(name=name,
+                                                meta_data_type=meta_data_type,
+                                                meta_tensor_type=MetaTensorType.INPUT,
+                                                axis_sequence=axis_sequence,
+                                                tensor=new_tensor)
             return new_tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
@@ -100,15 +104,20 @@ class TorchPlus:
             except:
                 pass
 
-            self.all_predict_tensors.new_tensor(name=name,ttype=MetaTensorType.PARAMETER,axis_sequence=axis_sequence,tensor=new_tensor)
+            self.all_predict_tensors.new_tensor(name=name,
+                                                meta_tensor_type=MetaTensorType.PARAMETER,
+                                                axis_sequence=axis_sequence,
+                                                tensor=new_tensor)
             return new_tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
 
-    def label(self:Self,data:List,axis_sequence=0)->torch.Tensor:
+    def label(self:Self,data:List,meta_data_type:MetaDataType,axis_sequence=0)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
             new_tensor=torch.FloatTensor(data)
-            self.all_label_tensors.new_tensor(axis_sequence=axis_sequence,tensor=new_tensor)
+            self.all_label_tensors.new_tensor(meta_data_type=meta_data_type,
+                                              axis_sequence=axis_sequence,
+                                              tensor=new_tensor)
             return new_tensor
 
     def get_parameters(self:Self)->Dict:

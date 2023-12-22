@@ -10,7 +10,7 @@ class MetaTensorType(Enum):
     INPUT = 1
     PARAMETER = 2
 
-class TensorDataType(Enum):
+class MetaDataType(Enum):
     NUMERICAL = 1
     CATEGORICAL = 2
 
@@ -21,6 +21,7 @@ class ProcessMode(Enum):
 @dataclass
 class TensorInternalSequencedUnsqeezed:
     name : str
+    meta_data_type : MetaDataType =MetaDataType.NUMERICAL
     meta_tensor_type : MetaTensorType = MetaTensorType.DEFAULT
     _tensor : torch.Tensor = field(repr=False,init=False)
     @property
@@ -72,8 +73,15 @@ class TensorInternal(TensorInternalSequenced):
 class TensorsManagerSequenced:
     tensors : List[TensorInternal] = field(default_factory=list)
 
-    def new_tensor(self,tensor:torch.Tensor,axis_sequence:int,ttype:MetaTensorType=MetaTensorType.DEFAULT,name:str=None):
-        current_ttp = TensorInternal(name=name,meta_tensor_type=ttype,axis_sequence=axis_sequence)
+    def new_tensor(self,tensor:torch.Tensor,
+                   axis_sequence:int,
+                   meta_tensor_type:MetaTensorType = MetaTensorType.DEFAULT,
+                   meta_data_type:MetaDataType = MetaDataType.NUMERICAL,
+                   name:str=None):
+        current_ttp = TensorInternal(name=name,
+                                     meta_tensor_type=meta_tensor_type,
+                                     meta_data_type=meta_data_type,
+                                     axis_sequence=axis_sequence)
         current_ttp.tensor = tensor
         self.tensors.append(current_ttp) 
 
