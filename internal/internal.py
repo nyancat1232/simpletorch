@@ -18,7 +18,7 @@ class ProcessMode(Enum):
 @dataclass
 class TensorInternalSequencedUnsqeezed:
     name : str
-    ttype : TTPType
+    ttype : TTPType = TTPType.DEFAULT
     _tensor : torch.Tensor = field(repr=False,init=False)
     @property
     def tensor(self):
@@ -69,7 +69,7 @@ class TensorInternal(TensorInternalSequenced):
 class TensorsManagerSequenced:
     tensors : List[TensorInternal] = field(default_factory=list)
 
-    def new_tensor(self,tensor:torch.Tensor,ttype:TTPType,axis_sequence:int,name:str=None):
+    def new_tensor(self,tensor:torch.Tensor,axis_sequence:int,ttype:TTPType=TTPType.DEFAULT,name:str=None):
         current_ttp = TensorInternal(name=name,ttype=ttype,axis_sequence=axis_sequence)
         current_ttp.tensor = tensor
         self.tensors.append(current_ttp) 

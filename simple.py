@@ -108,7 +108,7 @@ class TorchPlus:
     def label(self:Self,data:List,axis_sequence=0)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
             new_tensor=torch.FloatTensor(data)
-            self.all_label_tensors.new_tensor(ttype=TTPType.DEFAULT,axis_sequence=axis_sequence,tensor=new_tensor)
+            self.all_label_tensors.new_tensor(axis_sequence=axis_sequence,tensor=new_tensor)
             return new_tensor
 
     def get_parameters(self:Self)->Dict:
