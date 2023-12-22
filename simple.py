@@ -1,4 +1,4 @@
-from pyplus.pytorch.internal.internal import *
+from simpletorch.internal.internal import *
 from typing import Dict
 
 #works on pytorch 2.1.1
