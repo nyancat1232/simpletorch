@@ -1,7 +1,14 @@
 from simpletorch.internal.internal import *
-from typing import Dict
+from typing import Dict,ClassVar
 
 #works on pytorch 2.1.1
+
+
+@dataclass
+class RecommendInit:
+    DEFAULT : ClassVar[torch.nn.init] = torch.nn.init.xavier_normal
+    RELU : ClassVar[torch.nn.init] = torch.nn.init.kaiming_normal
+
 
 #https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
 @dataclass
@@ -80,9 +87,19 @@ class TorchPlus:
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
 
-    def parameter(self:Self,size:Tuple,name:str,axis_sequence=-1)->torch.Tensor:
+    def parameter(self:Self, 
+                  size:Tuple,name:str,
+                  init_func:RecommendInit=RecommendInit.DEFAULT,
+                  axis_sequence=-1) -> torch.Tensor:
+
         if self._current_mode == ProcessMode.ASSIGN:
-            new_tensor=torch.rand(*size)
+
+            new_tensor = torch.randn(*size)
+            try:
+                new_tensor = init_func(new_tensor)
+            except:
+                pass
+
             self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.PARAMETER,axis_sequence=axis_sequence,tensor=new_tensor)
             return new_tensor
         elif self._current_mode == ProcessMode.PROCESS:
