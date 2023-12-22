@@ -72,10 +72,11 @@ class TorchPlus:
         
         return ret
     
-    def input(self:Self,name:str,tensor:torch.Tensor,axis_sequence=0)->torch.Tensor:
+    def input(self:Self,data:List,name:str,axis_sequence=0)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.INPUT,axis_sequence=axis_sequence,tensor=tensor)
-            return tensor
+            new_tensor=torch.FloatTensor(data)
+            self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.INPUT,axis_sequence=axis_sequence,tensor=new_tensor)
+            return new_tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
 
