@@ -5,11 +5,14 @@ from typing import Any,Dict,Callable,Self,Tuple,Union,List
 
 from enum import Enum
 
-class TTPType(Enum):
+class MetaTensorType(Enum):
     DEFAULT = 0
     INPUT = 1
     PARAMETER = 2
 
+class TensorDataType(Enum):
+    NUMERICAL = 1
+    CATEGORICAL = 2
 
 class ProcessMode(Enum):
     ASSIGN = 1
@@ -18,7 +21,7 @@ class ProcessMode(Enum):
 @dataclass
 class TensorInternalSequencedUnsqeezed:
     name : str
-    ttype : TTPType = TTPType.DEFAULT
+    ttype : MetaTensorType = MetaTensorType.DEFAULT
     _tensor : torch.Tensor = field(repr=False,init=False)
     @property
     def tensor(self):
@@ -26,7 +29,7 @@ class TensorInternalSequencedUnsqeezed:
     @tensor.setter
     def tensor(self,tor_tensor : torch.Tensor) ->torch.Tensor:
         self._tensor = tor_tensor
-        if self.ttype==TTPType.PARAMETER:
+        if self.ttype==MetaTensorType.PARAMETER:
             self._tensor.requires_grad = True
         return self._tensor
 
@@ -69,7 +72,7 @@ class TensorInternal(TensorInternalSequenced):
 class TensorsManagerSequenced:
     tensors : List[TensorInternal] = field(default_factory=list)
 
-    def new_tensor(self,tensor:torch.Tensor,axis_sequence:int,ttype:TTPType=TTPType.DEFAULT,name:str=None):
+    def new_tensor(self,tensor:torch.Tensor,axis_sequence:int,ttype:MetaTensorType=MetaTensorType.DEFAULT,name:str=None):
         current_ttp = TensorInternal(name=name,ttype=ttype,axis_sequence=axis_sequence)
         current_ttp.tensor = tensor
         self.tensors.append(current_ttp) 
@@ -85,7 +88,7 @@ class TensorsManagerSequenced:
                 return current_tensor
 
     def get_all_params(self):
-        return {tensor.name :tensor.tensor for tensor in self.tensors if tensor.ttype == TTPType.PARAMETER}
+        return {tensor.name :tensor.tensor for tensor in self.tensors if tensor.ttype == MetaTensorType.PARAMETER}
 
     def get_max_dim(self):
         return max([tensor.tensor.dim() for tensor in self.tensors])

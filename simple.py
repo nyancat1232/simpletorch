@@ -47,7 +47,7 @@ class TorchPlus:
         #filter current sequence => unify dimensions => cals
 
         for epoch in range(self.meta_epoch):
-            min_sequence = min(self.all_predict_tensors.get_min_sequence_length(TTPType.INPUT),self.all_label_tensors.get_min_sequence_length(TTPType.DEFAULT))
+            min_sequence = min(self.all_predict_tensors.get_min_sequence_length(MetaTensorType.INPUT),self.all_label_tensors.get_min_sequence_length(MetaTensorType.DEFAULT))
 
             for sequence_ind in range(0,min_sequence,self.meta_data_per_iteration):
                 self._current_tensors_prediction = self.all_predict_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
@@ -68,7 +68,7 @@ class TorchPlus:
         for key in kwarg:
             self.all_predict_tensors.change_tensor(key,kwarg[key])
         
-        min_sequence = self.all_predict_tensors.get_min_sequence_length(TTPType.INPUT)
+        min_sequence = self.all_predict_tensors.get_min_sequence_length(MetaTensorType.INPUT)
 
         ret = []
         for sequence_ind in range(0,min_sequence):
@@ -82,7 +82,7 @@ class TorchPlus:
     def input(self:Self,data:List,name:str,axis_sequence=0)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
             new_tensor=torch.FloatTensor(data)
-            self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.INPUT,axis_sequence=axis_sequence,tensor=new_tensor)
+            self.all_predict_tensors.new_tensor(name=name,ttype=MetaTensorType.INPUT,axis_sequence=axis_sequence,tensor=new_tensor)
             return new_tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
@@ -100,7 +100,7 @@ class TorchPlus:
             except:
                 pass
 
-            self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.PARAMETER,axis_sequence=axis_sequence,tensor=new_tensor)
+            self.all_predict_tensors.new_tensor(name=name,ttype=MetaTensorType.PARAMETER,axis_sequence=axis_sequence,tensor=new_tensor)
             return new_tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
