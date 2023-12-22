@@ -79,10 +79,12 @@ class TorchPlus:
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
 
-    def parameter(self:Self,name:str,tensor:torch.Tensor,axis_sequence=-1)->torch.Tensor:
+    def parameter(self:Self,size:Tuple,name:str,axis_sequence=-1)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
-            self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.PARAMETER,axis_sequence=axis_sequence,tensor=tensor)
-            return tensor
+            new_tensor=torch.rand(*size)
+            print(new_tensor)
+            self.all_predict_tensors.new_tensor(name=name,ttype=TTPType.PARAMETER,axis_sequence=axis_sequence,tensor=new_tensor)
+            return new_tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
 
