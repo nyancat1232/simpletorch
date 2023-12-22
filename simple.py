@@ -6,8 +6,8 @@ from typing import Dict,ClassVar
 
 @dataclass
 class RecommendInit:
-    DEFAULT : ClassVar[torch.nn.init] = torch.nn.init.xavier_normal
-    RELU : ClassVar[torch.nn.init] = torch.nn.init.kaiming_normal
+    DEFAULT : ClassVar[torch.nn.init] = torch.nn.init.xavier_normal_
+    RELU : ClassVar[torch.nn.init] = torch.nn.init.kaiming_normal_
 
 
 #https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
