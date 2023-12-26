@@ -13,11 +13,11 @@ class RecommendInit:
 
 @dataclass
 class CurrentStateInformation:
-    current_epoch : int
-    max_epoch : int
-    current_iteration : int
-    len_iteration : int
-    current_loss : float
+    current_epoch : int = -1
+    max_epoch : int = -1
+    current_iteration : int = -1
+    len_iteration : int = -1
+    current_loss : float = 0.0
 
 
 #https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
@@ -61,6 +61,13 @@ class TorchPlus:
                 loss.backward()
                 optim.step()
                 optim.zero_grad()
+
+                csi=CurrentStateInformation()
+                csi.current_epoch = epoch
+                csi.current_iteration = sequence_ind
+                csi.len_iteration = min_sequence
+                csi.current_loss = loss
+                self.show_progress(csi)
             
             yield lambda **kwarg: self.predict(**kwarg)
 
