@@ -113,15 +113,15 @@ class TorchPlus:
         Parameters
         -----------
         data : List
-        inputs.
+            inputs.
         meta_data_type : MetaDataType
-        NUMERICAL => select if this data is a numerical data such as temperature
-        CATEGORICAL => select if this data is a categorical data such as color
+            NUMERICAL => select if this data is a numerical data such as temperature
+            CATEGORICAL => select if this data is a categorical data such as color
         name : str
-        tensor's name
+            tensor's `name`
         axis_sequence : int
-        if -1, then this is not a sequence.
-        else, then this is a sequence.
+            if -1, then this is not a sequence.
+            else, then this is a sequence.
 
         See Also
         --------
@@ -161,14 +161,14 @@ class TorchPlus:
         Parameters
         ----------
         size : Iterable
-        size for parameter.
+            `size` for parameter.
         name : str
-        tensor's name
+            ensor's `name`
         init_func : RecommendInit
-        how to initialize.
+            how to initialize.
         axis_sequence : int
-        if -1, then this is not a sequence.
-        else, then this is a sequence.
+            if -1, then this is not a sequence.
+            else, then this is a sequence.
 
         See Also
         --------
@@ -210,13 +210,13 @@ class TorchPlus:
         Parameters
         ----------
         data : List
-        labels.
+            labels.
         meta_data_type : MetaDataType
-        NUMERICAL => select if this data is a numerical data such as temperature
-        CATEGORICAL => select if this data is a categorical data such as color
+            NUMERICAL => select if this data is a numerical data such as temperature
+            CATEGORICAL => select if this data is a categorical data such as color
         axis_sequence : int
-        if -1, then this is not a sequence.
-        else, then this is a sequence.
+            if -1, then this is not a sequence.
+            else, then this is a sequence.
 
         See Also
         --------
