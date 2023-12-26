@@ -64,14 +64,15 @@ class TorchPlus:
                 optim.step()
                 optim.zero_grad()
 
-                csi=CurrentStateInformation()
-                csi.current_epoch = epoch
-                csi.current_iteration = sequence_ind
-                csi.len_iteration = min_sequence
-                csi.current_loss = loss
-                csi.all_features = {tensor.name : tensor.tensor for tensor in self.all_predict_tensors.tensors}
-                csi.all_labels = self.all_label_tensors.tensors[0].tensor
-                self.show_progress(csi)
+                if hasattr(self,'show_progress'):
+                    csi=CurrentStateInformation()
+                    csi.current_epoch = epoch
+                    csi.current_iteration = sequence_ind
+                    csi.len_iteration = min_sequence
+                    csi.current_loss = loss
+                    csi.all_features = {tensor.name : tensor.tensor for tensor in self.all_predict_tensors.tensors}
+                    csi.all_labels = self.all_label_tensors.tensors[0].tensor
+                    self.show_progress(csi)
             
             yield lambda **kwarg: self.predict(**kwarg)
 
