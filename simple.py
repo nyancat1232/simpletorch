@@ -18,6 +18,8 @@ class CurrentStateInformation:
     current_iteration : int = -1
     len_iteration : int = -1
     current_loss : float = 0.0
+    all_features : TensorsManager = field(default_factory=TensorsManager)
+    all_labels : TensorsManager = field(default_factory=TensorsManager)
 
 
 #https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
@@ -67,6 +69,8 @@ class TorchPlus:
                 csi.current_iteration = sequence_ind
                 csi.len_iteration = min_sequence
                 csi.current_loss = loss
+                csi.all_features = {tensor.name : tensor.tensor for tensor in self.all_predict_tensors.tensors}
+                csi.all_labels = self.all_label_tensors.tensors[0].tensor
                 self.show_progress(csi)
             
             yield lambda **kwarg: self.predict(**kwarg)
