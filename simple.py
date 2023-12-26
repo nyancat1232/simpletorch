@@ -81,13 +81,12 @@ class TorchPlus:
     
     def input(self:Self,data:List,meta_data_type:MetaDataType,name:str,axis_sequence=0)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
-            new_tensor=torch.FloatTensor(data)
-            self.all_predict_tensors.new_tensor(name=name,
+            ret = self.all_predict_tensors.new_tensor(name=name,
                                                 meta_data_type=meta_data_type,
                                                 meta_tensor_type=MetaTensorType.INPUT,
                                                 axis_sequence=axis_sequence,
-                                                tensor=new_tensor)
-            return new_tensor
+                                                tensor_data=data)
+            return ret
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
 
@@ -107,18 +106,17 @@ class TorchPlus:
             self.all_predict_tensors.new_tensor(name=name,
                                                 meta_tensor_type=MetaTensorType.PARAMETER,
                                                 axis_sequence=axis_sequence,
-                                                tensor=new_tensor)
+                                                tensor_data=new_tensor)
             return new_tensor
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
 
     def label(self:Self,data:List,meta_data_type:MetaDataType,axis_sequence=0)->torch.Tensor:
         if self._current_mode == ProcessMode.ASSIGN:
-            new_tensor=torch.FloatTensor(data)
-            self.all_label_tensors.new_tensor(meta_data_type=meta_data_type,
+            ret = self.all_label_tensors.new_tensor(meta_data_type=meta_data_type,
                                               axis_sequence=axis_sequence,
-                                              tensor=new_tensor)
-            return new_tensor
+                                              tensor_data=data)
+            return ret
 
     def get_parameters(self:Self)->Dict:
         return self.all_predict_tensors.get_all_params()

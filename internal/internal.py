@@ -73,7 +73,7 @@ class TensorInternal(TensorInternalSequenced):
 class TensorsManagerSequenced:
     tensors : List[TensorInternal] = field(default_factory=list)
 
-    def new_tensor(self,tensor:torch.Tensor,
+    def new_tensor(self,tensor_data:Any,
                    axis_sequence:int,
                    meta_tensor_type:MetaTensorType = MetaTensorType.DEFAULT,
                    meta_data_type:MetaDataType = MetaDataType.NUMERICAL,
@@ -82,8 +82,10 @@ class TensorsManagerSequenced:
                                      meta_tensor_type=meta_tensor_type,
                                      meta_data_type=meta_data_type,
                                      axis_sequence=axis_sequence)
-        current_ttp.tensor = tensor
+        current_ttp.tensor = torch.Tensor(tensor_data)
         self.tensors.append(current_ttp) 
+
+        return current_ttp.tensor
 
     def change_tensor(self,name,tensor:torch.Tensor):
         for current_tensor in self.tensors:
