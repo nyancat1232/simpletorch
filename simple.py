@@ -25,6 +25,12 @@ class CurrentStateInformation:
 #https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
 @dataclass
 class TorchPlus:
+    '''
+    For using pytorch more easily
+    
+    Functions
+    ---------
+    '''
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
     meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-4})
     meta_data_per_iteration : int = 1
@@ -104,7 +110,8 @@ class TorchPlus:
         '''
         Add inputs to the model
 
-        ## Parameters:
+        Parameters
+        -----------
         data : List
         inputs.
         meta_data_type : MetaDataType
@@ -116,11 +123,13 @@ class TorchPlus:
         if -1, then this is not a sequence.
         else, then this is a sequence.
 
-        ## See Also:
+        See Also
+        --------
         label
         parameter
 
-        ## Examples:
+        Examples
+        --------
         import torch
 
         from simpletorch.simple import TorchPlus,MetaDataType
@@ -149,7 +158,8 @@ class TorchPlus:
         '''
         Add parameters to the model
 
-        ## Parameters:
+        Parameters
+        ----------
         size : Iterable
         size for parameter.
         name : str
@@ -160,11 +170,13 @@ class TorchPlus:
         if -1, then this is not a sequence.
         else, then this is a sequence.
 
-        ## See Also:
+        See Also
+        --------
         label
         parameter
 
-        ## Examples:
+        Examples
+        --------
         import torch
 
         from simpletorch.simple import TorchPlus,MetaDataType
@@ -195,7 +207,8 @@ class TorchPlus:
         '''
         Add labels to the model
 
-        ## Parameters:
+        Parameters
+        ----------
         data : List
         labels.
         meta_data_type : MetaDataType
@@ -205,11 +218,13 @@ class TorchPlus:
         if -1, then this is not a sequence.
         else, then this is a sequence.
 
-        ## See Also:
+        See Also
+        --------
         input
         parameter
 
-        ## Examples:
+        Examples
+        --------
         import torch
 
         from simpletorch.simple import TorchPlus,MetaDataType
