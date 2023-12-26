@@ -1,5 +1,7 @@
-from simpletorch.internal.internal import *
-from typing import Dict,ClassVar
+from simpletorch.internal.internal import TensorsManager,ProcessMode,MetaTensorType,MetaDataType
+import torch
+from typing import Dict,ClassVar,Any,Self,List,Tuple
+from dataclasses import dataclass,field
 
 #works on pytorch 2.1.1
 
