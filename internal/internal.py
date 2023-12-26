@@ -82,7 +82,12 @@ class TensorsManagerSequenced:
                                      meta_tensor_type=meta_tensor_type,
                                      meta_data_type=meta_data_type,
                                      axis_sequence=axis_sequence)
-        current_ttp.tensor = torch.Tensor(tensor_data)
+        if meta_data_type == MetaDataType.NUMERICAL:
+            current_ttp.tensor = torch.FloatTensor(tensor_data)
+        elif meta_data_type == MetaDataType.CATEGORICAL:
+            current_ttp.tensor = torch.LongTensor(tensor_data)
+        else:
+            raise NotImplementedError("no implement of a MetaDataType")
         self.tensors.append(current_ttp) 
 
         return current_ttp.tensor
