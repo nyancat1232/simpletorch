@@ -101,6 +101,37 @@ class TorchPlus:
         return ret
     
     def input(self:Self,data:List,meta_data_type:MetaDataType,name:str,axis_sequence=0)->torch.Tensor:
+        '''
+        Add inputs to the model
+
+        ## Parameters:
+        data : List
+        inputs.
+        meta_data_type : MetaDataType
+        NUMERICAL => select if this data is a numerical data such as temperature
+        CATEGORICAL => select if this data is a categorical data such as color
+        name : str
+        tensor's name
+        axis_sequence : int
+        if -1, then this is not a sequence.
+        else, then this is a sequence.
+
+        ## See Also:
+        label
+        parameter
+
+        ## Examples:
+        import torch
+
+        from simpletorch.simple import TorchPlus,MetaDataType
+
+        class Model(TorchPlus):
+            def process(self):
+        ....
+                proc = self.input([2.,4.],MetaDataType.NUMERICAL,'input') * self.parameter([1],'param')
+        ......
+
+        '''
         if self._current_mode == ProcessMode.ASSIGN:
             ret = self.all_predict_tensors.new_tensor(name=name,
                                                 meta_data_type=meta_data_type,
@@ -114,8 +145,37 @@ class TorchPlus:
     def parameter(self:Self, 
                   size:Tuple,name:str,
                   init_func:RecommendInit=RecommendInit.DEFAULT,
-                  axis_sequence=-1) -> torch.Tensor:
+                  axis_sequence:int=-1) -> torch.Tensor:
+        '''
+        Add parameters to the model
 
+        ## Parameters:
+        size : Iterable
+        size for parameter.
+        name : str
+        tensor's name
+        init_func : RecommendInit
+        how to initialize.
+        axis_sequence : int
+        if -1, then this is not a sequence.
+        else, then this is a sequence.
+
+        ## See Also:
+        label
+        parameter
+
+        ## Examples:
+        import torch
+
+        from simpletorch.simple import TorchPlus,MetaDataType
+
+        class Model(TorchPlus):
+            def process(self):
+        ....
+                proc = self.input([2.,4.],MetaDataType.NUMERICAL,'input') * self.parameter([1],'param')
+        ......
+
+        '''
         if self._current_mode == ProcessMode.ASSIGN:
             new_tensor = torch.randn(*size)
             try:
@@ -132,6 +192,35 @@ class TorchPlus:
             return self._current_tensors_prediction.get_tensor(name).tensor 
 
     def label(self:Self,data:List,meta_data_type:MetaDataType,axis_sequence=0)->torch.Tensor:
+        '''
+        Add labels to the model
+
+        ## Parameters:
+        data : List
+        labels.
+        meta_data_type : MetaDataType
+        NUMERICAL => select if this data is a numerical data such as temperature
+        CATEGORICAL => select if this data is a categorical data such as color
+        axis_sequence : int
+        if -1, then this is not a sequence.
+        else, then this is a sequence.
+
+        ## See Also:
+        input
+        parameter
+
+        ## Examples:
+        import torch
+
+        from simpletorch.simple import TorchPlus,MetaDataType
+
+        class Model(TorchPlus):
+            def process(self):
+        ....
+                self.label([18.,36.],MetaDataType.NUMERICAL)
+        ......
+
+        '''
         if self._current_mode == ProcessMode.ASSIGN:
             ret = self.all_label_tensors.new_tensor(meta_data_type=meta_data_type,
                                               axis_sequence=axis_sequence,
