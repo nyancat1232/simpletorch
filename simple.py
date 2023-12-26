@@ -25,38 +25,28 @@ class CurrentStateInformation:
 class TorchPlus:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
     meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-4})
-    meta_epoch : int = 3000
     meta_data_per_iteration : int = 1
     meta_error_measurement : Any = torch.nn.MSELoss
     
     all_predict_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
     all_label_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
 
-    def __post_init__(self):
+    def train_init(self):
         if not hasattr(self, 'process'):
             raise NotImplementedError("Please, override \ndef process(self):\n\n function in this class.")
         
         self._current_mode = ProcessMode.ASSIGN
         self.process()
         self._current_mode = ProcessMode.PROCESS
-        
+
         if self.all_label_tensors.is_empty():
             raise NotImplementedError('Please, set labels by using \n self.label(..) \n in "def process(self):".')
 
-    def _train_one_step_by_equation(self,label:torch.Tensor,prediction_quation:torch.Tensor):
-        optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
+        print('init complete')
         
-        loss = self.meta_error_measurement()(prediction_quation,label)
-        loss.backward()
-        optim.step()
-        optim.zero_grad()
-
-        return loss
-
-    def train(self,show_every_iteration=False):
-        #filter current sequence => unify dimensions => cals
-
-        for epoch in range(self.meta_epoch):
+        epoch = -1
+        while True:
+            epoch += 1
             min_sequence = min(self.all_predict_tensors.get_min_sequence_length(MetaTensorType.INPUT),self.all_label_tensors.get_min_sequence_length(MetaTensorType.DEFAULT))
 
             for sequence_ind in range(0,min_sequence,self.meta_data_per_iteration):
@@ -64,16 +54,23 @@ class TorchPlus:
                 lab_tensors = self.all_label_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
 
                 pred = self.process()
-                loss = self._train_one_step_by_equation(lab_tensors.tensors[0].tensor,pred)
 
-                if show_every_iteration:
-                    self._current_state = CurrentStateInformation(current_epoch=epoch,max_epoch=self.meta_epoch,
-                                         current_iteration=sequence_ind,len_iteration=min_sequence,
-                                         current_loss=loss)
-                    self.iteration_event_function()
-                
-        return lambda **kwarg: self.predict(**kwarg)
-    
+                optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
+        
+                loss = self.meta_error_measurement()(pred,lab_tensors.tensors[0].tensor)
+                loss.backward()
+                optim.step()
+                optim.zero_grad()
+            
+            yield lambda **kwarg: self.predict(**kwarg)
+
+
+    def train(self,epoch:int=1000):
+        ret=None
+        for epoch,func in zip(range(epoch),self.train_init()):
+            ret = func
+        return ret
+
     def predict(self,**kwarg):
         self._current_mode = ProcessMode.PROCESS
 
@@ -108,13 +105,12 @@ class TorchPlus:
                   axis_sequence=-1) -> torch.Tensor:
 
         if self._current_mode == ProcessMode.ASSIGN:
-
             new_tensor = torch.randn(*size)
             try:
                 new_tensor = init_func(new_tensor)
             except:
                 pass
-
+            
             self.all_predict_tensors.new_tensor(name=name,
                                                 meta_tensor_type=MetaTensorType.PARAMETER,
                                                 axis_sequence=axis_sequence,
