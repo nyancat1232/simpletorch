@@ -1,6 +1,6 @@
 from simpletorch.internal.internal import TensorsManager,ProcessMode,MetaTensorType,MetaDataType
 import torch
-from typing import Dict,ClassVar,Any,Self,List,Tuple
+from typing import Dict,ClassVar,Any,Self,List,Tuple,Callable
 from dataclasses import dataclass,field
 
 #works on pytorch 2.1.1
@@ -10,6 +10,14 @@ from dataclasses import dataclass,field
 class RecommendInit:
     DEFAULT : ClassVar[torch.nn.init] = torch.nn.init.xavier_normal_
     RELU : ClassVar[torch.nn.init] = torch.nn.init.kaiming_normal_
+
+@dataclass
+class CurrentStateInformation:
+    current_epoch : int
+    max_epoch : int
+    current_iteration : int
+    len_iteration : int
+    current_loss : float
 
 
 #https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
@@ -58,9 +66,11 @@ class TorchPlus:
                 pred = self.process()
                 loss = self._train_one_step_by_equation(lab_tensors.tensors[0].tensor,pred)
 
-            
                 if show_every_iteration:
-                    print(f'Epoch : {epoch}/{self.meta_epoch}\tIteration : {sequence_ind}/{min_sequence}\tLoss : {loss}')
+                    self._current_state = CurrentStateInformation(current_epoch=epoch,max_epoch=self.meta_epoch,
+                                         current_iteration=sequence_ind,len_iteration=min_sequence,
+                                         current_loss=loss)
+                    self.iteration_event_function()
                 
         return lambda **kwarg: self.predict(**kwarg)
     
