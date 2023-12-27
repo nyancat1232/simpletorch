@@ -268,7 +268,8 @@ class TorchPlus(TorchPlusFundamental):
     def get_parameters(self:Self)->Dict:
         return self.all_predict_tensors.get_all_params()
 
-    def linear(self:Self,input:torch.Tensor,output:torch.Tensor,hidden_layer_size:List[int]):
+    def linear(self:Self,input:torch.Tensor,output:torch.Tensor
+               ,activation:Callable,hidden_layer_size:List[int]):
         neural_stack = [input.shape[-1]]
         neural_stack.extend(hidden_layer_size)
         neural_stack.extend([output.shape[0]])
@@ -278,7 +279,7 @@ class TorchPlus(TorchPlusFundamental):
         for ind,val in enumerate(zip(neural_stack,neural_stack[1:])):
             out = out @ self.parameter([val[0],val[1]],f'param{ind}')
             if ind<(len(neural_stack)-2):
-                out = torch.nn.functional.relu(out)
+                out = activation(out)
             else: 
                 out = out
         return out
