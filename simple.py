@@ -16,6 +16,7 @@ class CurrentStateInformation:
     current_epoch : int = -1
     max_epoch : int = -1
     current_iteration : int = -1
+    current_result : Any = None
     len_iteration : int = -1
     current_loss : float = 0.0
     all_features : TensorsManager = field(default_factory=TensorsManager)
@@ -55,6 +56,7 @@ class TorchPlusFundamental:
                 lab_tensors = self.all_label_tensors[sequence_ind:sequence_ind+self.meta_data_per_iteration]
 
                 pred = self.process()
+                epoch_dict['previous_value'] = pred
 
                 optim = self.meta_optimizer(self.all_predict_tensors.get_all_params().values(),**self.meta_optimizer_params)
         
@@ -68,6 +70,7 @@ class TorchPlusFundamental:
                     csi.current_epoch = epoch_dict['epoch']
                     csi.current_iteration = sequence_ind
                     csi.len_iteration = min_sequence
+                    csi.current_result = epoch_dict['previous_value']
                     csi.current_loss = loss
                     csi.all_features = {tensor.name : tensor.tensor for tensor in self.all_predict_tensors.tensors}
                     csi.all_labels = self.all_label_tensors.tensors[0].tensor
