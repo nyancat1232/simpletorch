@@ -271,11 +271,11 @@ class TorchPlus(TorchPlusFundamental):
     def get_parameters(self:Self)->Dict:
         return self.all_predict_tensors.get_all_params()
 
-    def linear(self:Self,input:torch.Tensor,output:torch.Tensor
+    def linear(self:Self,input:torch.Tensor,output_like:torch.Tensor
                ,activation:Callable,hidden_layer_size:List[int]):
         neural_stack = [input.shape[-1]]
         neural_stack.extend(hidden_layer_size)
-        neural_stack.extend([output.shape[0]])
+        neural_stack.extend([output_like.shape[0]])
         print(neural_stack)
         #<2
         out=input
