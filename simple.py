@@ -261,7 +261,24 @@ class TorchPlus(TorchPlusFundamental):
                                               axis_sequence=axis_sequence,
                                               tensor_data=data)
             return ret
+        else:
+            return self.all_label_tensors.tensors[0].tensor
+        
 
     def get_parameters(self:Self)->Dict:
         return self.all_predict_tensors.get_all_params()
 
+    def linear(self:Self,input:torch.Tensor,output:torch.Tensor,hidden_layer_size:List[int]):
+        neural_stack = [input.shape[-1]]
+        neural_stack.extend(hidden_layer_size)
+        neural_stack.extend([output.shape[0]])
+        print(neural_stack)
+        #<2
+        out=input
+        for ind,val in enumerate(zip(neural_stack,neural_stack[1:])):
+            out = out @ self.parameter([val[0],val[1]],f'param{ind}')
+            if ind<(len(neural_stack)-2):
+                out = torch.nn.functional.relu(out)
+            else: 
+                out = out
+        return out
