@@ -22,33 +22,8 @@ class CurrentStateInformation:
     all_labels : TensorsManager = field(default_factory=TensorsManager)
 
 
-#https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
 @dataclass
-class TorchPlus:
-    '''
-    For using pytorch more easily
-    
-    Methods
-    -------
-    input(data:List,meta_data_type:MetaDataType,name:str,axis_sequence=0)
-        add input tensor to the model
-    process()
-        must override this method.
-    show_progress()
-        override this method if you want to show progress.
-
-    Example
-    -------
-        class Test(TorchPlus):
-            def process(self):
-                proc = self.input([2.,4.],MetaDataType.NUMERICAL,'input') * self.parameter([1],'param')
-                
-                self.label([18.,36.],MetaDataType.NUMERICAL)
-                return proc
-            def show_progress(self,csi:CurrentStateInformation):
-                print(f'Epoch : {csi.current_epoch} \tIteration : {csi.current_iteration}/{csi.len_iteration}\tLoss : {csi.current_loss}')
-
-    '''
+class TorchPlusFundamental:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
     meta_optimizer_params : Dict = field(default_factory=lambda:{'lr':1e-4})
     meta_data_per_iteration : int = 1
@@ -123,7 +98,34 @@ class TorchPlus:
 
         
         return ret
+
+#https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
+@dataclass
+class TorchPlus(TorchPlusFundamental):
+    '''
+    For using pytorch more easily
     
+    Methods
+    -------
+    input(data:List,meta_data_type:MetaDataType,name:str,axis_sequence=0)
+        add input tensor to the model
+    process()
+        must override this method.
+    show_progress()
+        override this method if you want to show progress.
+
+    Example
+    -------
+        class Test(TorchPlus):
+            def process(self):
+                proc = self.input([2.,4.],MetaDataType.NUMERICAL,'input') * self.parameter([1],'param')
+                
+                self.label([18.,36.],MetaDataType.NUMERICAL)
+                return proc
+            def show_progress(self,csi:CurrentStateInformation):
+                print(f'Epoch : {csi.current_epoch} \tIteration : {csi.current_iteration}/{csi.len_iteration}\tLoss : {csi.current_loss}')
+
+    '''
     def input(self:Self,data:List,meta_data_type:MetaDataType,name:str,axis_sequence=0)->torch.Tensor:
         '''
         Add inputs to the model
