@@ -45,9 +45,9 @@ class TorchPlusFundamental:
 
         print('init complete')
         
-        epoch = -1
+        epoch_dict = {'epoch':-1}
         while True:
-            epoch += 1
+            epoch_dict['epoch'] = epoch_dict['epoch'] + 1
             min_sequence = min(self.all_predict_tensors.get_min_sequence_length(MetaTensorType.INPUT),self.all_label_tensors.get_min_sequence_length(MetaTensorType.DEFAULT))
 
             for sequence_ind in range(0,min_sequence,self.meta_data_per_iteration):
@@ -65,7 +65,7 @@ class TorchPlusFundamental:
 
                 if hasattr(self,'show_progress'):
                     csi=CurrentStateInformation()
-                    csi.current_epoch = epoch
+                    csi.current_epoch = epoch_dict['epoch']
                     csi.current_iteration = sequence_ind
                     csi.len_iteration = min_sequence
                     csi.current_loss = loss
