@@ -129,7 +129,11 @@ class TorchPlus(TorchPlusFundamental):
                 print(f'Epoch : {csi.current_epoch} \tIteration : {csi.current_iteration}/{csi.len_iteration}\tLoss : {csi.current_loss}')
 
     '''
-    def input(self:Self,data:List,meta_data_type:MetaDataType,name:str,axis_sequence=0)->torch.Tensor:
+    def input(self:Self,
+              name:str,
+              data:List,
+              meta_data_type:MetaDataType,
+              axis_sequence=0)->torch.Tensor:
         '''
         Add inputs to the model
 
@@ -174,8 +178,9 @@ class TorchPlus(TorchPlusFundamental):
         elif self._current_mode == ProcessMode.PROCESS:
             return self._current_tensors_prediction.get_tensor(name).tensor 
 
-    def parameter(self:Self, 
-                  size:Tuple,name:str,
+    def parameter(self:Self,
+                  name:str,
+                  size:Tuple,
                   init_func:RecommendInit=RecommendInit.DEFAULT,
                   axis_sequence:int=-1) -> torch.Tensor:
         '''
@@ -280,7 +285,7 @@ class TorchPlus(TorchPlusFundamental):
         #<2
         out=input
         for ind,val in enumerate(zip(neural_stack,neural_stack[1:])):
-            out = out @ self.parameter([val[0],val[1]],f'param{ind}')
+            out = out @ self.parameter(size=[val[0],val[1]],name=f'param{ind}')
             if ind<(len(neural_stack)-2):
                 out = activation(out)
             else: 
