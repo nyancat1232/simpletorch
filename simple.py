@@ -131,8 +131,8 @@ class TorchPlus(TorchPlusFundamental):
     '''
     def input(self:Self,
               name:str,
-              data:List,
-              meta_data_type:MetaDataType,
+              data:List = None,
+              meta_data_type:MetaDataType = None,
               axis_sequence=0)->torch.Tensor:
         '''
         Add inputs to the model
@@ -180,7 +180,7 @@ class TorchPlus(TorchPlusFundamental):
 
     def parameter(self:Self,
                   name:str,
-                  size:Tuple,
+                  size:Tuple = None,
                   init_func:RecommendInit=RecommendInit.DEFAULT,
                   axis_sequence:int=-1) -> torch.Tensor:
         '''
