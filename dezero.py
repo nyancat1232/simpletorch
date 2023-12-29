@@ -7,15 +7,23 @@ class Variable:
 
     def __init__(self,data,creator=None):
         self.data = data
-        self.creator = creator
+        if creator is not None:
+            self.creator = creator
 
     def backward(self):
-        previous_func = self.creator
-        if previous_func is not None:
-            previous_input = previous_func.generate_input_grad()
-            return previous_input.backward()
-        else:
-            return self
+        qu = [self.creator]
+        last_vars = []
+        try:
+            while previous_func := qu.pop():
+                previous_input = previous_func.generate_input_grad()
+                try:
+                    qu.append(previous_input.creator)
+                except:
+                    print('last variable')
+                    last_vars.append(previous_input)
+        except:
+            print('end')
+            return last_vars
     
     def __repr__(self):
         ret_str = f'data:{self.data}\t'
