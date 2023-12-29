@@ -6,47 +6,45 @@ import numpy as np
 @dataclass
 class Variable:
     data : Any
-    creator : Any = None
-    grad : Any = field(init=False)
-
-    def __post_init__(self):
-        self.grad = None
+    creator : Any = field(default=None,repr=False)
+    grad : Any = field(init=False,repr=False)
 
     def backward(self):
         previous_func = self.creator
         if previous_func is not None:
-            output = previous_func.output #if optimize, then set to 'self'
-            input = previous_func.input
-            
-            input.grad = previous_func.backward(output.grad) 
-            input.backward()
+            previous_input = previous_func.generate_input_grad()
+            previous_input.backward()
+    
 
 @dataclass
 class Function:
-
-    def __call__(self:Self,input:Variable)->Variable:
-        self.input = input
-        output_data = self.forward(self.input.data)
-        self.output = Variable(output_data,self)
-
+    input : Variable
+    output : Variable = field(init=False,repr=False)
+    
+    def generate_output(self)->Variable:
+        self.output = Variable(self.forward(),self)
         return self.output
     
-    def forward(self,input_data:Any)->Any:
+    def generate_input_grad(self)->Variable:
+        self.input.grad = self.backward()
+        return self.input
+
+    def forward(self)->Any:
         raise NotImplementedError('You must implement forward')
-    def backward(self, output_grad: Any) -> Any:
+    def backward(self) -> Any:
         raise NotImplementedError('You must implement forward')
     
 class Square(Function):
-    def forward(self,input_data:Any)->Any:
-        return input_data ** 2
-    def backward(self, output_grad: Any) -> Any:
-        return (2 * self.input.data ) * output_grad
+    def forward(self)->Any:
+        return self.input.data ** 2
+    def backward(self) -> Any:
+        return (2 * self.input.data ) * self.output.grad
     
 class Exp(Function):
-    def forward(self, input_data: Any) -> Any:
-        return np.exp(input_data)
-    def backward(self, output_grad: Any) -> Any:
-        return np.exp(self.input.data ) * output_grad
+    def forward(self)->Any:
+        return np.exp(self.input.data)
+    def backward(self) -> Any:
+        return np.exp(self.input.data ) * self.output.grad
     
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
