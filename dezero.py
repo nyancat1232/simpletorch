@@ -13,7 +13,9 @@ class Variable:
         previous_func = self.creator
         if previous_func is not None:
             previous_input = previous_func.generate_input_grad()
-            previous_input.backward()
+            return previous_input.backward()
+        else:
+            return self
     
 
 @dataclass
