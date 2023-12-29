@@ -17,11 +17,11 @@ class Function:
     memory_input : Any = None
 
     def __call__(self:Self,input:Variable)->Variable:
-        self.input_data = input.data
-        self.output_data = self.forward(self.input_data)
-        output = Variable(self.output_data,self)
+        self.input = input
+        output_data = self.forward(self.input.data)
+        self.output = Variable(output_data,self)
 
-        return output
+        return self.output
     
     def forward(self,input_data:Any)->Any:
         raise NotImplementedError('You must implement forward')
@@ -32,13 +32,13 @@ class Square(Function):
     def forward(self,input_data:Any)->Any:
         return input_data ** 2
     def backward(self, output_grad: Any) -> Any:
-        return (2 * self.input_data ) * output_grad
+        return (2 * self.input.data ) * output_grad
     
 class Exp(Function):
     def forward(self, input_data: Any) -> Any:
         return np.exp(input_data)
     def backward(self, output_grad: Any) -> Any:
-        return np.exp(self.input_data ) * output_grad
+        return np.exp(self.input.data ) * output_grad
     
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
