@@ -1,16 +1,16 @@
 from dataclasses import dataclass,field
-from typing import Any,Self
+from typing import Any,List,Self
 import numpy as np
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
 class Variable:
 
-    def __init__(self,data,creator=None):
+    def __init__(self,data:Any,creator:Self=None):
         self.data = data
         if creator is not None:
             self.creator = creator
 
-    def backward(self):
+    def backward(self)->List:
         qu = [self.creator]
         last_vars = []
         try:
@@ -39,7 +39,7 @@ class Variable:
     
 
 class Function:
-    def __call__(self,input):
+    def __call__(self,input:Variable):
         self.input = input
         return self.generate_output()
     
@@ -65,12 +65,16 @@ class Square(Function):
         return self.input.data ** 2
     def backward(self) -> Any:
         return (2 * self.input.data ) * self.output.grad
+def square(input:Variable)->Variable:
+    return Square()(input)
     
 class Exp(Function):
     def forward(self)->Any:
         return np.exp(self.input.data)
     def backward(self) -> Any:
         return np.exp(self.input.data ) * self.output.grad
+def exp(input:Variable)->Variable:
+    return Exp()(input)
     
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
