@@ -38,10 +38,10 @@ class Variable:
         return ret_str
     
 
-@dataclass
 class Function:
-    input : Variable
-    output : Variable = field(init=False,repr=False)
+    def __call__(self,input):
+        self.input = input
+        return self.generate_output()
     
     def generate_output(self)->Variable:
         try:
