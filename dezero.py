@@ -24,7 +24,11 @@ class Function:
     output : Variable = field(init=False,repr=False)
     
     def generate_output(self)->Variable:
-        self.output = Variable(self.forward(),self)
+        try:
+            self.output.data = self.forward()
+        except:
+            print('generate new Variable')
+            self.output = Variable(self.forward(),self)
         return self.output
     
     def generate_input_grad(self)->Variable:
