@@ -3,11 +3,11 @@ from typing import Any,Self
 import numpy as np
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
-@dataclass
 class Variable:
-    data : Any
-    creator : Any = field(default=None,repr=False)
-    grad : Any = field(init=False,repr=False)
+
+    def __init__(self,data,creator=None):
+        self.data = data
+        self.creator = creator
 
     def backward(self):
         previous_func = self.creator
@@ -16,6 +16,18 @@ class Variable:
             return previous_input.backward()
         else:
             return self
+    
+    def __repr__(self):
+        ret_str = f'data:{self.data}\t'
+        try:
+            ret_str = ret_str + f'grad:{self.grad}\t'
+        except:
+            pass
+        try:
+            ret_str = ret_str + f'previous function:{self.creator}\t'
+        except:
+            pass
+        return ret_str
     
 
 @dataclass
