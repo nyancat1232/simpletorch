@@ -33,6 +33,9 @@ class TorchPlusFundamental:
     all_predict_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
     all_label_tensors : TensorsManager = field(init=False,default_factory=TensorsManager)
 
+    def process(self):
+        raise NotImplementedError("You must implement process(self)")
+
     def train_init(self):
         if not hasattr(self, 'process'):
             raise NotImplementedError("Please, override \ndef process(self):\n\n function in this class.")
