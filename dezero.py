@@ -12,9 +12,17 @@ class Variable:
     def __post_init__(self):
         self.grad = None
 
+    def backward(self):
+        previous_func = self.creator
+        if previous_func is not None:
+            output = previous_func.output #if optimize, then set to 'self'
+            input = previous_func.input
+            
+            input.grad = previous_func.backward(output.grad) 
+            input.backward()
+
 @dataclass
 class Function:
-    memory_input : Any = None
 
     def __call__(self:Self,input:Variable)->Variable:
         self.input = input
