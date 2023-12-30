@@ -5,7 +5,6 @@ import numpy as np
 
 def init_as_ndarray(data:Any)->np.ndarray:
     if not isinstance(data,np.ndarray):
-        print(f'not ndarray {type(data)}')
         return np.array(data)
     else:
         return data
@@ -28,10 +27,8 @@ class Variable:
                 try:
                     qu.append(previous_input.creator)
                 except:
-                    print('last variable')
                     last_vars.append(previous_input)
         except:
-            print('end')
             return last_vars
     
     def __repr__(self):
@@ -56,7 +53,6 @@ class Function:
         try:
             self.output.data = self.forward()
         except:
-            print('generate new Variable')
             self.output = Variable(self.forward(),self)
         return self.output
     
