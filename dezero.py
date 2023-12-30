@@ -46,7 +46,7 @@ class Variable:
             pass
         return ret_str
 
-def init_variable(data,creator:Self=None)->Variable:
+def init_variable(data,creator:Variable=None)->Variable:
     if not isinstance(data,Variable):
         return Variable(data,creator)
     else:
