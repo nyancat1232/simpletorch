@@ -75,7 +75,7 @@ class Function:
     def generate_output(self)->Variable:
         assert not hasattr(self,'output')
         forward_result = self.forward()
-        ff = lambda fr:Variable(fr,self)
+        ff = lambda fr:init_variable(fr,self)
         appl_val, is_multiple = apply_each(forward_result,ff)
 
         if is_multiple:
