@@ -96,7 +96,7 @@ class Function:
     def generate_output(self)->Variable:
         assert not hasattr(self,'output')
         assert not hasattr(self,'outputs')
-        
+
         forward_result = self.forward()
         ff = lambda fr:init_variable(fr,self)
         appl_val, is_multiple = apply_each(forward_result,ff)
