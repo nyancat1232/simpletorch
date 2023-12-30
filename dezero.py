@@ -44,6 +44,7 @@ class Variable:
 
         self.data = init_ndarray(data)
         assert isinstance(self.data,np.ndarray)
+        self.grad = np.ones_like(self.data)
 
         if creator is not None:
             self.creator = creator
