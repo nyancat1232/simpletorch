@@ -61,15 +61,6 @@ def init_variable(data,creator:Variable=None)->Variable:
     else:
         return data
 
-def apply_single_or_multiple(value,func_apply):
-    try:
-        if len(value)>1:
-            return [func_apply(v) for v in value], True
-        else:
-            return func_apply(value[0]), False
-    except TypeError:
-        return func_apply(value),False
-
 class Function:
     def __call__(self,*inputs:Variable)->Variable:
         appl_val, is_multiple = apply_single_or_multiple(inputs,init_variable)
