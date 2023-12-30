@@ -3,6 +3,15 @@ from typing import Any,List,Self
 import numpy as np
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
+def apply_single_or_multiple(value,func_apply):
+    try:
+        if len(value)>1:
+            return [func_apply(v) for v in value], True
+        else:
+            return func_apply(value[0]), False
+    except TypeError:
+        return func_apply(value),False
+    
 def init_ndarray(data)->np.ndarray:
     if not isinstance(data,np.ndarray):
         return np.array(data)
