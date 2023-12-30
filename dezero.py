@@ -31,7 +31,7 @@ class Variable:
                     qu.append(previous_input.creator)
                 except:
                     last_vars.append(previous_input)
-        except:
+        except IndexError as ie:
             return last_vars
     
     def __repr__(self):
