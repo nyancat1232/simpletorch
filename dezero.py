@@ -47,8 +47,6 @@ class Variable:
         return ret_str
 
 def init_variable(data,creator:Self=None)->Variable:
-    assert not isinstance(data,(list,tuple))
-    
     if not isinstance(data,Variable):
         return Variable(data,creator)
     else:
