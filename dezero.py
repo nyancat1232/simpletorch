@@ -3,7 +3,7 @@ from typing import Any,List,Self
 import numpy as np
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
-def init_as_ndarray(data:Any)->np.ndarray:
+def init_as_ndarray(data)->np.ndarray:
     if not isinstance(data,np.ndarray):
         return np.array(data)
     else:
@@ -11,7 +11,7 @@ def init_as_ndarray(data:Any)->np.ndarray:
 
 class Variable:
 
-    def __init__(self,data:Any,creator:Self=None):
+    def __init__(self,data,creator:Self=None):
         self.data = init_as_ndarray(data)
         assert isinstance(self.data,np.ndarray)
 
@@ -43,7 +43,7 @@ class Variable:
             pass
         return ret_str
 
-def convert_as_variable(data:Any)->Variable:
+def convert_as_variable(data)->Variable:
     if not isinstance(data,Variable):
         return Variable(data)
     else:
