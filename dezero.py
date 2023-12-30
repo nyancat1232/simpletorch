@@ -53,6 +53,7 @@ def convert_as_variable(data)->Variable:
         return Variable(data)
     else:
         return data
+    
 
 class Function:
     def __call__(self,*inputs:Variable)->Variable:
