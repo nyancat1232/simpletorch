@@ -13,6 +13,7 @@ class Variable:
 
     def __init__(self,data,creator:Self=None):
         assert not isinstance(data,Variable)
+        assert not isinstance(data,(list,tuple))
 
         self.data = init_as_ndarray(data)
         assert isinstance(self.data,np.ndarray)
