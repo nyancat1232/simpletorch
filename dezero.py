@@ -13,10 +13,7 @@ def init_as_ndarray(data:Any)->np.ndarray:
 class Variable:
 
     def __init__(self,data:Any,creator:Self=None):
-        if not isinstance(data,np.ndarray):
-            self.data = np.array(data)
-        else:
-            self.data = data
+        self.data = init_as_ndarray(data)
         assert isinstance(self.data,np.ndarray)
 
         if creator is not None:
