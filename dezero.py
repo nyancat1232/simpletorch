@@ -63,10 +63,9 @@ class Function:
         return self.generate_output()
     
     def generate_output(self)->Variable:
-        try:
-            self.output.data = self.forward()
-        except:
-            self.output = Variable(self.forward(),self)
+        assert not hasattr(self,'output')
+
+        self.output = Variable(self.forward(),self)
         return self.output
     
     def generate_input_grad(self)->Variable:
