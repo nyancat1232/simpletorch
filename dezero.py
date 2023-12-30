@@ -4,6 +4,24 @@ import numpy as np
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
 def apply_each(value,func_apply):
+    '''
+    apply each elements with func_apply
+    
+    Examples
+    --------
+    v = 3
+    vr = apply_each(v,lambda v:v**2)
+    print(vr)
+    >>>> (9, False)
+    v = [2]
+    vr = apply_each(v,lambda v:v**2)
+    print(vr)
+    >>>> (4, False)
+    v = [4,5,6]
+    vr = apply_each(v,lambda v:v**2)
+    print(vr)
+    >>>> ([16, 25, 36], True)
+    '''
     try:
         if len(value)>1:
             return [func_apply(v) for v in value], True
