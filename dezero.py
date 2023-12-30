@@ -26,7 +26,7 @@ class Variable:
         last_vars = []
         try:
             while previous_func := qu.pop():
-                previous_input = previous_func.generate_input_grad()
+                previous_input = previous_func.calculate_input_grad()
                 try:
                     qu.append(previous_input.creator)
                 except:
@@ -71,7 +71,7 @@ class Function:
             self.output = Variable(self.forward(),self)
         return self.output
     
-    def generate_input_grad(self)->Variable:
+    def calculate_input_grad(self)->Variable:
         self.input.grad = self.backward()
         return self.input
 
