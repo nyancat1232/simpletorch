@@ -3,6 +3,13 @@ from typing import Any,List,Self
 import numpy as np
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
+def init_as_ndarray(data:Any)->np.ndarray:
+    if not isinstance(data,np.ndarray):
+        print(f'not ndarray {type(data)}')
+        return np.array(data)
+    else:
+        return data
+
 class Variable:
 
     def __init__(self,data:Any,creator:Self=None):
