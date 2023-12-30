@@ -46,11 +46,11 @@ class Variable:
             pass
         return ret_str
 
-def convert_as_variable(data)->Variable:
+def convert_as_variable(data,creator:Self=None)->Variable:
     assert not isinstance(data,(list,tuple))
     
     if not isinstance(data,Variable):
-        return Variable(data)
+        return Variable(data,creator)
     else:
         return data
     
