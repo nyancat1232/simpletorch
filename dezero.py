@@ -42,11 +42,16 @@ class Variable:
         except:
             pass
         return ret_str
-    
+
+def convert_as_variable(data:Any)->Variable:
+    if not isinstance(data,Variable):
+        return Variable(data)
+    else:
+        return data
 
 class Function:
     def __call__(self,input:Variable)->Variable:
-        self.input = input
+        self.input = convert_as_variable(input)
         return self.generate_output()
     
     def generate_output(self)->Variable:
