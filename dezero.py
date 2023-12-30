@@ -63,10 +63,12 @@ def apply_single_or_multiple(value,func_apply):
 
 class Function:
     def __call__(self,*inputs:Variable)->Variable:
-        if len(inputs)>1:
-            self.inputs = [init_variable(input) for input in inputs]
+        appl_val, is_multiple = apply_single_or_multiple(inputs,init_variable)
+
+        if is_multiple:
+            self.inputs = appl_val
         else:
-            self.input = init_variable(inputs[0])
+            self.input = appl_val
 
         return self.generate_output()
     
