@@ -6,7 +6,12 @@ import numpy as np
 class Variable:
 
     def __init__(self,data:Any,creator:Self=None):
-        self.data = data
+        if not isinstance(data,np.ndarray):
+            self.data = np.array(data)
+        else:
+            self.data = data
+        assert isinstance(self.data,np.ndarray)
+
         if creator is not None:
             self.creator = creator
 
