@@ -64,8 +64,11 @@ class Function:
     
     def generate_output(self)->Variable:
         assert not hasattr(self,'output')
-
-        self.output = Variable(self.forward(),self)
+        forward_result = self.forward()
+        if isinstance(forward_result,list):
+            raise NotImplementedError("Not")
+        else:
+            self.output = Variable(self.forward(),self)
         return self.output
     
     def generate_input_grad(self)->Variable:
