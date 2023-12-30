@@ -12,6 +12,8 @@ def init_as_ndarray(data)->np.ndarray:
 class Variable:
 
     def __init__(self,data,creator:Self=None):
+        assert not isinstance(data,Variable)
+
         self.data = init_as_ndarray(data)
         assert isinstance(self.data,np.ndarray)
 
@@ -53,7 +55,11 @@ def convert_as_variable(data)->Variable:
 
 class Function:
     def __call__(self,*inputs:Variable)->Variable:
-        self.input = convert_as_variable(inputs[0])
+        if len(inputs)>1:
+            self.inputs = [convert_as_variable(input) for input in inputs]
+        else:
+            self.input = convert_as_variable(inputs[0])
+
         return self.generate_output()
     
     def generate_output(self)->Variable:
