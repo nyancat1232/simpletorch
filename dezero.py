@@ -142,6 +142,8 @@ class Add(Function):
         return sum([input.data for input in self.inputs])
     def backward(self):
         return [self.output.grad for input in self.inputs]
+def add(*inputs)->Variable:
+    return Add()(*inputs)
     
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
