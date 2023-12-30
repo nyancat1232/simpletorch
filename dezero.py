@@ -3,7 +3,7 @@ from typing import Any,List,Self
 import numpy as np
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
-def apply_single_or_multiple(value,func_apply):
+def apply_each(value,func_apply):
     try:
         if len(value)>1:
             return [func_apply(v) for v in value], True
@@ -63,7 +63,7 @@ def init_variable(data,creator:Variable=None)->Variable:
 
 class Function:
     def __call__(self,*inputs:Variable)->Variable:
-        appl_val, is_multiple = apply_single_or_multiple(inputs,init_variable)
+        appl_val, is_multiple = apply_each(inputs,init_variable)
 
         if is_multiple:
             self.inputs = appl_val
