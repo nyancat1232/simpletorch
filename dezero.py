@@ -35,11 +35,13 @@ class Variable:
         last_vars = []
         try:
             while previous_func := qu.pop():
-                previous_input = previous_func.calculate_input_grad()
-                try:
-                    qu.append(previous_input.creator)
-                except:
-                    last_vars.append(previous_input)
+                previous_inputs = previous_func.calculate_input_grad()
+                def apply_queue(previous_input):
+                    try:
+                        qu.append(previous_input.creator)
+                    except:
+                        last_vars.append(previous_input)
+                apply_each(previous_inputs,apply_queue)
         except IndexError as ie:
             return last_vars
     
@@ -85,8 +87,14 @@ class Function:
         return self.output
     
     def calculate_input_grad(self)->Variable:
-        self.input.grad = self.backward()
-        return self.input
+        backward_result=self.backward()
+        if isinstance(backward_result,list):
+            for input,grad in zip(self.inputs,backward_result):
+                input.grad = grad
+            
+        else:
+            self.input.grad = backward_result
+            return self.input
 
     def forward(self):
         raise NotImplementedError('You must implement forward')
@@ -108,6 +116,13 @@ class Exp(Function):
         return np.exp(self.input.data ) * self.output.grad
 def exp(input:Variable)->Variable:
     return Exp()(input)
+
+class Add(Function):
+    def forward(self):
+        return sum([input.data for input in self.inputs])
+    def backward(self):
+        print(self.inputs)
+        return [self.output.grad for input in self.inputs]
     
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
