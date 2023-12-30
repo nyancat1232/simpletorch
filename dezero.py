@@ -109,7 +109,6 @@ class Function:
         if isinstance(backward_result,list):
             for input,grad in zip(self.inputs,backward_result):
                 input.grad = grad
-            
         else:
             self.input.grad = backward_result
             return self.input
@@ -139,7 +138,6 @@ class Add(Function):
     def forward(self):
         return sum([input.data for input in self.inputs])
     def backward(self):
-        print(self.inputs)
         return [self.output.grad for input in self.inputs]
     
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
