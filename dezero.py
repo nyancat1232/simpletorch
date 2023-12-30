@@ -84,10 +84,13 @@ class Function:
     def generate_output(self)->Variable:
         assert not hasattr(self,'output')
         forward_result = self.forward()
-        if isinstance(forward_result,list):
-            raise NotImplementedError("Not")
+        ff = lambda fr:Variable(fr,self)
+        appl_val, is_multiple = apply_single_or_multiple(forward_result,ff)
+
+        if is_multiple:
+            self.outputs = appl_val
         else:
-            self.output = Variable(self.forward(),self)
+            self.output = appl_val
         return self.output
     
     def calculate_input_grad(self)->Variable:
