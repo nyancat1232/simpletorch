@@ -50,8 +50,8 @@ def convert_as_variable(data:Any)->Variable:
         return data
 
 class Function:
-    def __call__(self,input:Variable)->Variable:
-        self.input = convert_as_variable(input)
+    def __call__(self,*inputs:Variable)->Variable:
+        self.input = convert_as_variable(inputs[0])
         return self.generate_output()
     
     def generate_output(self)->Variable:
