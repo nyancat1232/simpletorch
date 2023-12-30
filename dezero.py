@@ -48,7 +48,7 @@ class Variable:
     
 
 class Function:
-    def __call__(self,input:Variable):
+    def __call__(self,input:Variable)->Variable:
         self.input = input
         return self.generate_output()
     
@@ -64,23 +64,23 @@ class Function:
         self.input.grad = self.backward()
         return self.input
 
-    def forward(self)->Any:
+    def forward(self):
         raise NotImplementedError('You must implement forward')
-    def backward(self) -> Any:
+    def backward(self):
         raise NotImplementedError('You must implement forward')
     
 class Square(Function):
-    def forward(self)->Any:
+    def forward(self):
         return self.input.data ** 2
-    def backward(self) -> Any:
+    def backward(self):
         return (2 * self.input.data ) * self.output.grad
 def square(input:Variable)->Variable:
     return Square()(input)
     
 class Exp(Function):
-    def forward(self)->Any:
+    def forward(self):
         return np.exp(self.input.data)
-    def backward(self) -> Any:
+    def backward(self):
         return np.exp(self.input.data ) * self.output.grad
 def exp(input:Variable)->Variable:
     return Exp()(input)
