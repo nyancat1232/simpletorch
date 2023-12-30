@@ -126,7 +126,7 @@ class Square(Function):
         return self.input.data ** 2
     def backward(self):
         return (2 * self.input.data ) * self.output.grad
-def square(input:Variable)->Variable:
+def square(input)->Variable:
     return Square()(input)
     
 class Exp(Function):
@@ -134,7 +134,7 @@ class Exp(Function):
         return np.exp(self.input.data)
     def backward(self):
         return np.exp(self.input.data ) * self.output.grad
-def exp(input:Variable)->Variable:
+def exp(input)->Variable:
     return Exp()(input)
 
 class Add(Function):
