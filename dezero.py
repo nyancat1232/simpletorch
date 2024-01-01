@@ -41,6 +41,7 @@ class Variable:
     data : np.ndarray
     grad : np.ndarray
     creator : Function
+    generation : int
 
     def __init__(self,data,creator:Function=None):
         assert not isinstance(data,Variable)
@@ -91,6 +92,7 @@ class Function:
     inputs : List[Variable]
     output : Variable
     outputs : List[Variable]
+    generation : int
 
     def __call__(self,*inputs:Variable):
         appl_val, is_multiple = apply_each(inputs,init_variable)
