@@ -55,7 +55,12 @@ class Variable:
     generation : int
 
     def __init__(self,data,creator:Function=None):
-        pass
+        self.data = init_ndarray(data)
+        if creator is not None:
+            self.creator = creator
+            self.generation = creator.generation + 1
+        else:
+            self.generation = 0
 
     def backward(self)->List:
         pass
