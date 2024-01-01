@@ -77,24 +77,11 @@ class Variable:
     def backward(self,first=True):
         if first:
             self.grad = 1.0
-        
-        if hasattr(self,'creator'):
-            self.creator.calculate_input_grad()
 
-    def get_all_parent_variable(self):
         if hasattr(self,'creator'):
-            l = []
-            for input in self.creator.inputs:
-                rr = input.get_all_parent_variable()
-                try:
-                    l.extend(rr)
-                except:
-                    l.append(rr)
-            return l
-                
-        else:
-            return self
-        
+            all_order_func = self.creator.get_all_parent_variable()
+            for func in all_order_func:
+                func.calculate_input_grad()
     
     def __repr__(self):
         ret_str = f'data:{self.data}\t'
@@ -136,8 +123,16 @@ class Function:
         for input_var, res_grad in zip(self.inputs,input_grad_result):
             input_var.grad = res_grad
 
-            input_var.backward(first=False)
-
+    def get_all_parent_variable(self):
+        l = [self]
+        for input in self.inputs:
+            try:
+                rr = input.creator.get_all_parent_variable()
+                l.extend(rr)
+            except:
+                pass
+        l.sort(key=lambda elem:elem.generation,reverse=True)
+        return l
 
     def forward(self,input_datas:List[Any])->List[Any]:
         raise NotImplementedError('You must implement forward')
