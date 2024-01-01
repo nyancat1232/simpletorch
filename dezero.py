@@ -7,7 +7,7 @@ import numpy as np
 apply_each_T : TypeVar('apply_each_T')
 
 def apply_each(value,
-               func_apply):
+               func_apply,return_multiple=False):
     '''
     apply each elements with func_apply
     
@@ -28,13 +28,19 @@ def apply_each(value,
     print(vr)
     >>>> ([16, 25, 36], True)
     '''
+    def ret(data,b):
+        if return_multiple:
+            return data, b
+        else:
+            return data
+
     try:
         if len(value)>1:
-            return [func_apply(v) for v in value], True
+            return ret([func_apply(v) for v in value], True)
         else:
-            return func_apply(value[0]), False
+            return ret(func_apply(value[0]), False)
     except TypeError:
-        return func_apply(value),False
+        return ret(func_apply(value),False)
     
 def init_ndarray(data)->np.ndarray:
     if not isinstance(data,np.ndarray):
