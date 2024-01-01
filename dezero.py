@@ -93,7 +93,7 @@ class Function:
     outputs : List[Variable]
     generation : int
 
-    def __call__(self,*inputs:Any):
+    def __call__(self,*inputs:Any)->List[Variable]:
 
         self.inputs = apply_each(inputs,lambda data:init_variable(data))
         def check(c,type):
