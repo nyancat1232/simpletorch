@@ -114,7 +114,7 @@ class Function:
             self.outputs = appl_val
         else:
             self.output = appl_val
-        return self.output
+        return appl_val
     
     def calculate_input_grad(self)->Variable:
         backward_result=self.backward()
