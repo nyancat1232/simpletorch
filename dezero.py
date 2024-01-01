@@ -101,6 +101,7 @@ class Function:
             ret_str = ret_str + f'outputs:{self.outputs}\t'
         except:
             pass
+        return ret_str
 
     
 class Square(Function):
