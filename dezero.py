@@ -78,10 +78,6 @@ class Variable:
             ret_str = ret_str + f'grad:{self.grad}\t'
         except:
             pass
-        try:
-            ret_str = ret_str + f'previous function:{self.creator}\t'
-        except:
-            pass
 
         return ret_str
 
