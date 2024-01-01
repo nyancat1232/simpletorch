@@ -144,7 +144,7 @@ class Square(Function):
         return [input_datas[0] ** 2]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         return [2 * input_datas[0] * output_grads[0]]
-def square(*input)->List[Variable]:
+def square(*input)->Variable:
     return Square()(*input)[0]
     
 class Exp(Function):
@@ -152,7 +152,7 @@ class Exp(Function):
         return [np.exp(input_datas[0]) ]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         return [np.exp(input_datas[0]) * output_grads[0]]
-def exp(*input)->List[Variable]:
+def exp(*input)->Variable:
     return Exp()(*input)[0]
 
 class Add(Function):
@@ -160,7 +160,7 @@ class Add(Function):
         return [sum(input_datas)]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         return apply_each(input_datas,lambda i:output_grads[0])
-def add(*inputs)->List[Variable]:
+def add(*inputs)->Variable:
     return Add()(*inputs)[0]
     
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
