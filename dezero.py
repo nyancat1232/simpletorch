@@ -94,7 +94,7 @@ class Function:
     outputs : List[Variable]
     generation : int
 
-    def __call__(self,*inputs:Variable):
+    def __call__(self,*inputs:Any):
         appl_val, is_multiple = apply_each(inputs,init_variable)
 
         if is_multiple:
