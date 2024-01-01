@@ -94,9 +94,9 @@ class Function:
     def calculate_input_grad(self):
         pass
 
-    def forward(self):
+    def forward(self,input_data):
         raise NotImplementedError('You must implement forward')
-    def backward(self):
+    def backward(self,input_data,output_grad):
         raise NotImplementedError('You must implement forward')
     
     def __repr__(self):
