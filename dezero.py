@@ -80,6 +80,21 @@ class Variable:
         
         if hasattr(self,'creator'):
             self.creator.calculate_input_grad()
+
+    def get_all_parent_variable(self):
+        if hasattr(self,'creator'):
+            l = []
+            for input in self.creator.inputs:
+                rr = input.get_all_parent_variable()
+                try:
+                    l.extend(rr)
+                except:
+                    l.append(rr)
+            return l
+                
+        else:
+            return self
+        
     
     def __repr__(self):
         ret_str = f'data:{self.data}\t'
