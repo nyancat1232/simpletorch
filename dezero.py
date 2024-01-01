@@ -140,6 +140,8 @@ class Function:
         raise NotImplementedError('You must implement backward')
     
     def __repr__(self):
+        ret_str = f'generation:{self.generation}\t'
+        return ret_str
         ret_str = f'inputs:{self.inputs}\t'
         ret_str = ret_str + f'generation:{self.generation}\t'
         try:
