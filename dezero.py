@@ -74,8 +74,12 @@ class Variable:
         else:
             self.generation = 0
 
-    def backward(self)->List:
-        pass
+    def backward(self,first=True)->List:
+        if first:
+            self.grad = 1.0
+        
+        if hasattr(self,'creator'):
+            self.creator.calculate_input_grad()
     
     def __repr__(self):
         ret_str = f'data:{self.data}\t'
@@ -110,7 +114,15 @@ class Function:
         return self.outputs
     
     def calculate_input_grad(self):
-        pass
+        input_datas = [input.data for input in self.inputs]
+        output_grads = [output.grad for output in self.outputs]
+
+        input_grad_result = self.backward(input_datas,output_grads)
+        for input_var, res_grad in zip(self.inputs,input_grad_result):
+            input_var.grad = res_grad
+
+            input_var.backward(first=False)
+
 
     def forward(self,input_datas:List[Any])->List[Any]:
         raise NotImplementedError('You must implement forward')
