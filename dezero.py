@@ -55,42 +55,10 @@ class Variable:
     generation : int
 
     def __init__(self,data,creator:Function=None):
-        assert not isinstance(data,Variable)
-        assert not isinstance(data,(list,tuple))
-
-        self.data = init_ndarray(data)
-        assert isinstance(self.data,np.ndarray)
-        self.grad = np.ones_like(self.data)
-        
-        if creator is not None:
-            self.creator = creator
-            self.generation = creator.generation + 1
-        else:
-            self.generation = 0
-
-
+        pass
 
     def backward(self)->List:
-        qu = [self.creator]
-        last_vars = []
-        _seen_set = set()
-        try:
-            while previous_func := qu.pop():
-                previous_inputs = previous_func.calculate_input_grad()
-                def apply_queue(previous_input):
-                    def _do_before_append(append_func):
-                        if previous_input not in _seen_set:
-                            return append_func
-                        else:
-                            return lambda x : None
-                    try:
-                        _do_before_append(qu.append)(previous_input.creator)
-                    except:
-                        _do_before_append(last_vars.append)(previous_input)
-                apply_each(previous_inputs,apply_queue)
-                print(previous_func)
-        except IndexError as ie:
-            return last_vars
+        pass
     
     def __repr__(self):
         ret_str = f'data:{self.data}\t'
@@ -115,38 +83,13 @@ class Function:
     generation : int
 
     def __call__(self,*inputs:Any):
-        appl_val, is_multiple = apply_each(inputs,init_variable)
-        self.generation = max([val.generation for val in appl_val])
-
-        assert type(self.generation) == int
-        assert is_multiple == True
-        self.inputs = appl_val
-
-            
-
-        return self.generate_output()
+        pass
     
     def generate_output(self):
-        assert not hasattr(self,'output')
-        assert not hasattr(self,'outputs')
-
-        forward_result = self.forward()
-        ff = lambda fr:init_variable(fr,self)
-        appl_val, is_multiple = apply_each(forward_result,ff)
-        assert is_multiple == True
-
-        self.outputs = appl_val
-
-        return appl_val
+        pass
     
-    def calculate_input_grad(self)->Variable:
-        backward_result=self.backward()
-        if isinstance(backward_result,list):
-            for input,grad in zip(self.inputs,backward_result):
-                input.grad = grad
-        else:
-            self.input.grad = backward_result
-            return self.input
+    def calculate_input_grad(self):
+        pass
 
     def forward(self):
         raise NotImplementedError('You must implement forward')
@@ -155,25 +98,25 @@ class Function:
     
 class Square(Function):
     def forward(self):
-        return [input.data ** 2 for input in self.inputs]
+        pass
     def backward(self):
-        return [(2 * input.data ) * output.grad  for input,output in zip(self.inputs,self.outputs)]
+        pass
 def square(input)->Variable:
     return Square()(input)
     
 class Exp(Function):
     def forward(self):
-        return [np.exp(input.data) for input in self.inputs]
+        pass
     def backward(self):
-        return [np.exp(input.data ) * output.grad for input,output in zip(self.inputs,self.outputs)]
+        pass
 def exp(input)->Variable:
     return Exp()(input)
 
 class Add(Function):
     def forward(self):
-        return sum([input.data for input in self.inputs])
+        pass
     def backward(self):
-        return [output.grad for input,output in zip(self.inputs,self.outputs)]
+        pass
 def add(*inputs)->Variable:
     return Add()(*inputs)
     
