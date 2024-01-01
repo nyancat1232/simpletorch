@@ -115,7 +115,7 @@ class Function:
     def forward(self,input_datas:List[Any])->List[Any]:
         raise NotImplementedError('You must implement forward')
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
-        raise NotImplementedError('You must implement forward')
+        raise NotImplementedError('You must implement backward')
     
     def __repr__(self):
         ret_str = f'inputs:{self.inputs}\t'
