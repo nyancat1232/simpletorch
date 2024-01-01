@@ -19,10 +19,12 @@ def apply_each(value:apply_each_T,
     vr = apply_each(v,lambda v:v**2)
     print(vr)
     >>>> (9, False)
+
     v = [2]
     vr = apply_each(v,lambda v:v**2)
     print(vr)
     >>>> (4, False)
+
     v = [4,5,6]
     vr = apply_each(v,lambda v:v**2)
     print(vr)
