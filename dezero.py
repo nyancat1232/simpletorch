@@ -74,7 +74,7 @@ class Variable:
         else:
             self.generation = 0
 
-    def backward(self,first=True)->List:
+    def backward(self,first=True):
         if first:
             self.grad = 1.0
         
