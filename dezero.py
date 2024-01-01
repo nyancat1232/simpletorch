@@ -1,10 +1,15 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
-from typing import Any,List,Self,Callable,Union
+from typing import Any,List,Self,Callable,Union,Tuple,TypeVar
 import numpy as np
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
-def apply_each(value:Any,func_apply:Callable[[Union[Any,List[Any]]],Union[Any,List[Any]]]):
+apply_each_T : TypeVar('apply_each_T')
+
+def apply_each(value:apply_each_T,
+               func_apply:Callable[
+                   [Union[apply_each_T,List[apply_each_T]]],Union[apply_each_T,List[apply_each_T]]
+                   ])-> Tuple[Union[apply_each_T,List[apply_each_T]], bool]:
     '''
     apply each elements with func_apply
     
@@ -53,6 +58,9 @@ class Variable:
         
         if creator is not None:
             self.creator = creator
+            self.generation = creator.generation + 1
+        else:
+            self.generation = 0
 
     def backward(self)->List:
         qu = [self.creator]
@@ -79,6 +87,10 @@ class Variable:
             ret_str = ret_str + f'previous function:{self.creator}\t'
         except:
             pass
+        try:
+            ret_str = ret_str + f'generation:{self.generation}\t'
+        except:
+            pass
         return ret_str
 
 def init_variable(data,creator:Variable=None)->Variable:
@@ -96,7 +108,10 @@ class Function:
 
     def __call__(self,*inputs:Any):
         appl_val, is_multiple = apply_each(inputs,init_variable)
-
+        try:
+            self.generation = max([val.generation for val in appl_val])
+        except:
+            self.generation = appl_val.generation
         if is_multiple:
             self.inputs = appl_val
         else:
