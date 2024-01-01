@@ -88,10 +88,20 @@ class Function:
     generation : int
 
     def __call__(self,*inputs:Any):
-        pass
-    
-    def generate_output(self):
-        pass
+
+        self.inputs = apply_each(inputs,lambda data:init_variable(data))
+        def check(c,type):
+            assert isinstance(c,type)
+        apply_each(self.inputs,lambda c:check(c,Variable))
+
+        if not isinstance(self.inputs,list):
+            self.inputs = [self.inputs]
+
+        self.generation = max([input.generation for input in self.inputs])
+        output_result = self.forward([input.data for input in self.inputs])
+        assert isinstance(output_result,list)
+        self.outputs = apply_each(output_result,lambda c:init_variable(c,self))
+        return self.outputs
     
     def calculate_input_grad(self):
         pass
