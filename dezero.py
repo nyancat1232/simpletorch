@@ -109,23 +109,18 @@ def init_variable(data,creator:Variable=None)->Variable:
         return data
 
 class Function:
-    input : Variable
     inputs : List[Variable]
-    output : Variable
     outputs : List[Variable]
     generation : int
 
     def __call__(self,*inputs:Any):
         appl_val, is_multiple = apply_each(inputs,init_variable)
-        try:
-            self.generation = max([val.generation for val in appl_val])
-        except:
-            self.generation = appl_val.generation
+        self.generation = max([val.generation for val in appl_val])
+
         assert type(self.generation) == int
-        if is_multiple:
-            self.inputs = appl_val
-        else:
-            self.input = appl_val
+        assert is_multiple == True
+        self.inputs = appl_val
+
             
 
         return self.generate_output()
@@ -137,11 +132,10 @@ class Function:
         forward_result = self.forward()
         ff = lambda fr:init_variable(fr,self)
         appl_val, is_multiple = apply_each(forward_result,ff)
+        assert is_multiple == True
 
-        if is_multiple:
-            self.outputs = appl_val
-        else:
-            self.output = appl_val
+        self.outputs = appl_val
+
         return appl_val
     
     def calculate_input_grad(self)->Variable:
@@ -160,17 +154,17 @@ class Function:
     
 class Square(Function):
     def forward(self):
-        return self.input.data ** 2
+        return [input.data ** 2 for input in self.inputs]
     def backward(self):
-        return (2 * self.input.data ) * self.output.grad
+        return [(2 * input.data ) * output.grad  for input,output in zip(self.inputs,self.outputs)]
 def square(input)->Variable:
     return Square()(input)
     
 class Exp(Function):
     def forward(self):
-        return np.exp(self.input.data)
+        return [np.exp(input.data) for input in self.inputs]
     def backward(self):
-        return np.exp(self.input.data ) * self.output.grad
+        return [np.exp(input.data ) * output.grad for input,output in zip(self.inputs,self.outputs)]
 def exp(input)->Variable:
     return Exp()(input)
 
@@ -178,7 +172,7 @@ class Add(Function):
     def forward(self):
         return sum([input.data for input in self.inputs])
     def backward(self):
-        return [self.output.grad for input in self.inputs]
+        return [output.grad for input,output in zip(self.inputs,self.outputs)]
 def add(*inputs)->Variable:
     return Add()(*inputs)
     
