@@ -110,25 +110,25 @@ class Function:
 
     
 class Square(Function):
-    def forward(self):
-        pass
-    def backward(self):
+    def forward(self,input_data):
+        pass 
+    def backward(self,input_data,output_grad):
         pass
 def square(input)->Variable:
     return Square()(input)
     
 class Exp(Function):
-    def forward(self):
+    def forward(self,input_data):
         pass
-    def backward(self):
+    def backward(self,input_data,output_grad):
         pass
 def exp(input)->Variable:
     return Exp()(input)
 
 class Add(Function):
-    def forward(self):
+    def forward(self,input_data):
         pass
-    def backward(self):
+    def backward(self,input_data,output_grad):
         pass
 def add(*inputs)->Variable:
     return Add()(*inputs)
