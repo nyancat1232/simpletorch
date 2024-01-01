@@ -42,6 +42,12 @@ def apply_each(value,
     except TypeError:
         return ret(func_apply(value),False)
     
+def listify(check_value):
+    if not isinstance(check_value,list):
+        return [check_value]
+    else:
+        return check_value
+
 def init_ndarray(data)->np.ndarray:
     if not isinstance(data,np.ndarray):
         return np.array(data)
@@ -94,13 +100,13 @@ class Function:
             assert isinstance(c,type)
         apply_each(self.inputs,lambda c:check(c,Variable))
 
-        if not isinstance(self.inputs,list):
-            self.inputs = [self.inputs]
+        self.inputs = listify(self.inputs)
 
         self.generation = max([input.generation for input in self.inputs])
         output_result = self.forward([input.data for input in self.inputs])
         assert isinstance(output_result,list)
         self.outputs = apply_each(output_result,lambda c:init_variable(c,self))
+        self.outputs = listify(self.outputs)
         return self.outputs
     
     def calculate_input_grad(self):
