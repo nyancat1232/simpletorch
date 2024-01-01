@@ -123,25 +123,25 @@ class Function:
     
 class Square(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
-        pass 
+        return [input_datas[0] ** 2]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
-        pass
-def square(input)->Variable:
-    return Square()(input)
+        return [2 * input_datas[0] * output_grads[0]]
+def square(*input)->Variable:
+    return Square()(*input)
     
 class Exp(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
-        pass
+        return [np.exp(input_datas[0]) ]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
-        pass
-def exp(input)->Variable:
-    return Exp()(input)
+        return [np.exp(input_datas[0]) * output_grads[0]]
+def exp(*input)->Variable:
+    return Exp()(*input)
 
 class Add(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
-        pass
+        return [sum(input_datas)]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
-        pass
+        return apply_each(input_datas,lambda i:output_grads[0])
 def add(*inputs)->Variable:
     return Add()(*inputs)
     
