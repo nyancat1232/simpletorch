@@ -1,10 +1,10 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
-from typing import Any,List,Self
+from typing import Any,List,Self,Callable
 import numpy as np
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
-def apply_each(value,func_apply):
+def apply_each(value,func_apply:Callable[[Any],Any]):
     '''
     apply each elements with func_apply
     
@@ -38,6 +38,9 @@ def init_ndarray(data)->np.ndarray:
         return data
 
 class Variable:
+    data : np.ndarray
+    grad : np.ndarray
+    creator : Function
 
     def __init__(self,data,creator:Function=None):
         assert not isinstance(data,Variable)
@@ -46,7 +49,7 @@ class Variable:
         self.data = init_ndarray(data)
         assert isinstance(self.data,np.ndarray)
         self.grad = np.ones_like(self.data)
-
+        
         if creator is not None:
             self.creator = creator
 
@@ -84,7 +87,12 @@ def init_variable(data,creator:Variable=None)->Variable:
         return data
 
 class Function:
-    def __call__(self,*inputs:Variable)->Variable:
+    input : Variable
+    inputs : List[Variable]
+    output : Variable
+    outputs : List[Variable]
+
+    def __call__(self,*inputs:Variable):
         appl_val, is_multiple = apply_each(inputs,init_variable)
 
         if is_multiple:
@@ -94,7 +102,7 @@ class Function:
 
         return self.generate_output()
     
-    def generate_output(self)->Variable:
+    def generate_output(self):
         assert not hasattr(self,'output')
         assert not hasattr(self,'outputs')
 
