@@ -112,10 +112,12 @@ class Function:
             self.generation = max([val.generation for val in appl_val])
         except:
             self.generation = appl_val.generation
+        assert type(self.generation) == int
         if is_multiple:
             self.inputs = appl_val
         else:
             self.input = appl_val
+            
 
         return self.generate_output()
     
