@@ -62,6 +62,7 @@ class Variable:
     
     def __repr__(self):
         ret_str = f'data:{self.data}\t'
+        ret_str = ret_str + f'generation:{self.generation}\t'
         try:
             ret_str = ret_str + f'grad:{self.grad}\t'
         except:
@@ -70,10 +71,7 @@ class Variable:
             ret_str = ret_str + f'previous function:{self.creator}\t'
         except:
             pass
-        try:
-            ret_str = ret_str + f'generation:{self.generation}\t'
-        except:
-            pass
+
         return ret_str
 
 
@@ -95,6 +93,15 @@ class Function:
         raise NotImplementedError('You must implement forward')
     def backward(self):
         raise NotImplementedError('You must implement forward')
+    
+    def __repr__(self):
+        ret_str = f'inputs:{self.inputs}\t'
+        ret_str = ret_str + f'generation:{self.generation}\t'
+        try:
+            ret_str = ret_str + f'outputs:{self.outputs}\t'
+        except:
+            pass
+
     
 class Square(Function):
     def forward(self):
