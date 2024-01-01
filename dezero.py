@@ -68,7 +68,7 @@ class Variable:
         try:
             while previous_func := qu.pop():
                 previous_inputs = previous_func.calculate_input_grad()
-                def apply_queue():
+                def apply_queue(previous_inputs):
                     try:
                         qu.append(previous_inputs.creator)
                     except:
