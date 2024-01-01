@@ -6,10 +6,8 @@ import numpy as np
 
 apply_each_T : TypeVar('apply_each_T')
 
-def apply_each(value:apply_each_T,
-               func_apply:Callable[
-                   [Union[apply_each_T,List[apply_each_T]]],Union[apply_each_T,List[apply_each_T]]
-                   ])-> Tuple[Union[apply_each_T,List[apply_each_T]], bool]:
+def apply_each(value,
+               func_apply):
     '''
     apply each elements with func_apply
     
