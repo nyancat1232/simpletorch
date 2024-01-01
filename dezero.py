@@ -1,10 +1,10 @@
 from __future__ import annotations
 from dataclasses import dataclass,field
-from typing import Any,List,Self,Callable
+from typing import Any,List,Self,Callable,Union
 import numpy as np
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
-def apply_each(value,func_apply:Callable[[Any],Any]):
+def apply_each(value,func_apply:Callable[[Union[Any,List[Any]]],Union[Any,List[Any]]]):
     '''
     apply each elements with func_apply
     
