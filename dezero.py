@@ -67,22 +67,19 @@ class Variable:
     def backward(self)->List:
         qu = [self.creator]
         last_vars = []
-        _seen_set = set()
+        
         try:
             while previous_func := qu.pop():
                 previous_inputs = previous_func.calculate_input_grad()
                 def apply_queue(previous_inputs):
                     def _do_before_append(append_func):
-                        if previous_inputs not in _seen_set:
-                            _seen_set.add(previous_inputs)
-                            return append_func
-                        else:
-                            return lambda x:None
+                        return append_func
                     try:
                         _do_before_append(qu.append)(previous_inputs.creator)
                     except:
                         _do_before_append(last_vars.append)(previous_inputs)
                 apply_each(previous_inputs,apply_queue)
+                print(previous_func)
         except IndexError as ie:
             return last_vars
     
