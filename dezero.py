@@ -100,7 +100,7 @@ class Function:
         try:
             ret_str = ret_str + f'outputs:{self.outputs}\t'
         except:
-            pass
+            ret_str = ret_str + f'no outputs\t'
         return ret_str
 
     
