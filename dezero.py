@@ -100,9 +100,9 @@ class Function:
     def calculate_input_grad(self):
         pass
 
-    def forward(self,input_data):
+    def forward(self,input_datas:List[Any])->List[Any]:
         raise NotImplementedError('You must implement forward')
-    def backward(self,input_data,output_grad):
+    def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         raise NotImplementedError('You must implement forward')
     
     def __repr__(self):
@@ -116,25 +116,25 @@ class Function:
 
     
 class Square(Function):
-    def forward(self,input_data):
+    def forward(self,input_datas:List[Any])->List[Any]:
         pass 
-    def backward(self,input_data,output_grad):
+    def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         pass
 def square(input)->Variable:
     return Square()(input)
     
 class Exp(Function):
-    def forward(self,input_data):
+    def forward(self,input_datas:List[Any])->List[Any]:
         pass
-    def backward(self,input_data,output_grad):
+    def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         pass
 def exp(input)->Variable:
     return Exp()(input)
 
 class Add(Function):
-    def forward(self,input_data):
+    def forward(self,input_datas:List[Any])->List[Any]:
         pass
-    def backward(self,input_data,output_grad):
+    def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         pass
 def add(*inputs)->Variable:
     return Add()(*inputs)
