@@ -59,11 +59,11 @@ class Variable:
         try:
             while previous_func := qu.pop():
                 previous_inputs = previous_func.calculate_input_grad()
-                def apply_queue(previous_input):
+                def apply_queue(previous_inputs):
                     try:
-                        qu.append(previous_input.creator)
+                        qu.append(previous_inputs.creator)
                     except:
-                        last_vars.append(previous_input)
+                        last_vars.append(previous_inputs)
                 apply_each(previous_inputs,apply_queue)
         except IndexError as ie:
             return last_vars
