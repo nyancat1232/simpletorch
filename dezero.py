@@ -39,7 +39,7 @@ def init_ndarray(data)->np.ndarray:
 
 class Variable:
 
-    def __init__(self,data,creator=None):
+    def __init__(self,data,creator:Function=None):
         assert not isinstance(data,Variable)
         assert not isinstance(data,(list,tuple))
 
