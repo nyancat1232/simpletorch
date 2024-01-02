@@ -146,6 +146,11 @@ class Function:
             except:
                 input_var.grad = res_grad
 
+        #We don't need output's grad anymore. 
+        def remove_output_grad(output:Variable):
+            del output.grad
+        apply_each(self.outputs,remove_output_grad)
+
     def get_all_parent_variable(self):
         l = [self]
         for input in self.inputs:
