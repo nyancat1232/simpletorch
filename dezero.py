@@ -2,6 +2,7 @@ from __future__ import annotations
 from dataclasses import dataclass,field
 from typing import Any,List,Self,Callable,Union,Tuple,TypeVar
 import numpy as np
+import contextlib
 #This source references 'ゼロから作る Deep Learning' by 斎藤 康毅
 
 apply_each_T : TypeVar('apply_each_T')
@@ -92,6 +93,17 @@ class Variable:
 
         return ret_str
 
+class Config:
+    enable_backprop = True
+
+@contextlib.contextmanager
+def config_test(name,value):
+    old_value = getattr(Config,name)
+    setattr(Config,name,value)
+    try:
+        yield
+    finally:
+        setattr(Config,name,old_value)
 
 class Function:
     inputs : List[Variable]
@@ -107,11 +119,16 @@ class Function:
 
         self.inputs = listify(self.inputs)
 
-        self.generation = max([input.generation for input in self.inputs])
         output_result = self.forward([input.data for input in self.inputs])
         assert isinstance(output_result,list)
-        self.outputs = apply_each(output_result,lambda c:init_variable(c,self))
+        
+        if Config.enable_backprop:
+            self.generation = max([input.generation for input in self.inputs])
+            self.outputs = apply_each(output_result,lambda c:init_variable(c,self))
+        else:
+            self.outputs = apply_each(output_result,lambda c:init_variable(c))
         self.outputs = listify(self.outputs)
+
         return self.outputs
     #x,y,z
     #*
