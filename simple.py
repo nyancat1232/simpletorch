@@ -2,7 +2,7 @@ from simpletorch.internal.internal import TensorsManager,ProcessMode,MetaTensorT
 import torch
 from typing import Dict,ClassVar,Any,Self,List,Tuple,Callable
 from dataclasses import dataclass,field
-
+import contextlib
 #works on pytorch 2.1.1
 
 
@@ -23,6 +23,15 @@ class CurrentStateInformation:
     all_labels : TensorsManager = field(default_factory=TensorsManager)
 
 
+@contextlib.contextmanager
+def assign_mode(current_instant,process_mode:ProcessMode):
+    current_instant._current_mode = process_mode
+    try:
+        yield
+    finally:
+        current_instant._current_mode = ProcessMode.PROCESS
+
+
 @dataclass
 class TorchPlusFundamental:
     meta_optimizer : torch.optim.Optimizer = torch.optim.SGD
@@ -40,9 +49,8 @@ class TorchPlusFundamental:
         if not hasattr(self, 'process'):
             raise NotImplementedError("Please, override \ndef process(self):\n\n function in this class.")
         
-        self._current_mode = ProcessMode.ASSIGN
-        self.process()
-        self._current_mode = ProcessMode.PROCESS
+        with assign_mode(self,process_mode=ProcessMode.ASSIGN):
+            self.process()
 
         if self.all_label_tensors.is_empty():
             raise NotImplementedError('Please, set labels by using \n self.label(..) \n in "def process(self):".')
