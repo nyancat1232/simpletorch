@@ -74,9 +74,8 @@ class Variable:
         else:
             self.generation = 0
 
-    def backward(self,first=True):
-        if first:
-            self.grad = 1.0
+    def backward_from_end(self):
+        self.grad = 1.0
 
         if hasattr(self,'creator'):
             all_order_func = self.creator.get_all_parent_variable()
