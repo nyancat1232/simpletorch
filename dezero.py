@@ -114,14 +114,37 @@ class Function:
         self.outputs = apply_each(output_result,lambda c:init_variable(c,self))
         self.outputs = listify(self.outputs)
         return self.outputs
+    #x,y,z
+    #*
+    #xyz
+    #
+    #Lyz,Lxz,Lxy
+    #x,x,x
+    #*
+    #x^3
+    #
+    #3x^2L
     
+    #x,y,z
+    #+
+    #x+y+z
+    #
+    #L,L,L
+    #x,x,x
+    #+
+    #3x
+    #
+    #3L
     def calculate_input_grad(self):
         input_datas = [input.data for input in self.inputs]
         output_grads = [output.grad for output in self.outputs]
 
         input_grad_result = self.backward(input_datas,output_grads)
         for input_var, res_grad in zip(self.inputs,input_grad_result):
-            input_var.grad = res_grad
+            try:
+                input_var.grad = input_var.grad + res_grad
+            except:
+                input_var.grad = res_grad
 
     def get_all_parent_variable(self):
         l = [self]
