@@ -249,6 +249,7 @@ def seq_operate(operate_func,*inputs):
         ret = operate_func(ret,v)
     return ret
 seq_product = lambda *inputs:seq_operate(lambda x,y:x*y,*inputs)
+seq_subtract = lambda*inputs:seq_operate(lambda x,y:x-y,*inputs)
 
 class Mul(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
@@ -258,13 +259,20 @@ class Mul(Function):
                           lambda inpdat: 
                           seq_product(*[data for data in input_datas if data != inpdat])
                           )
-mul = single_out(Mul)
+
+class Sub(Function):
+    def forward(self, input_datas: List[Any]) -> List[Any]:
+        return [seq_subtract(*input_datas)]
+    def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
+        return [-output_grads[0] for data in input_datas]
+sub:Variable = single_out(Sub)
 
 Variable.__neg__ = neg
 Variable.__mul__ = mul
 Variable.__add__ = add
 Variable.__rmul__ = mul
 Variable.__radd__ = add
+Variable.__sub__ = sub
 
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
