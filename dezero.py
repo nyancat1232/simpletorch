@@ -235,6 +235,14 @@ class Add(Function):
         return apply_each(input_datas,lambda i:output_grads[0])
 add = single_out(Add)
 
+class Neg(Function):
+    def forward(self,input_datas:List[Any])->List[Any]:
+        return [-input_datas[0]]
+    def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
+        return apply_each(input_datas,lambda i:output_grads[0])
+neg = single_out(Neg)
+
+Variable.__neg__ = neg
 
 def product(*inputs):
     ret = 1
