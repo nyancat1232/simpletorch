@@ -236,6 +236,22 @@ class Add(Function):
         return apply_each(input_datas,lambda i:output_grads[0])
 def add(*inputs)->Variable:
     return Add()(*inputs)[0]
+
+def product(*inputs):
+    ret = 1
+    for v in inputs:
+        ret = ret*v
+    return ret
+class Mul(Function):
+    def forward(self,input_datas:List[Any])->List[Any]:
+        return [ product(*input_datas) ]
+    def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
+        return apply_each(input_datas,
+                          lambda inpdat: 
+                          product(*[data for data in input_datas if data != inpdat])
+                          )
+def mul(*inputs)->Variable:
+    return Mul()(*inputs)[0]
     
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
