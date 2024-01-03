@@ -110,6 +110,7 @@ class Variable:
 
         return ret_str
 
+single_out = lambda cl: lambda *inputs:cl()(*inputs)[0]
 
 class Config:
     enable_backprop = True
@@ -219,24 +220,21 @@ class Square(Function):
         return [input_datas[0] ** 2]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         return [2 * input_datas[0] * output_grads[0]]
-def square(*input)->Variable:
-    return Square()(*input)[0]
-    
+square = single_out(Square)
 class Exp(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
         return [np.exp(input_datas[0]) ]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         return [np.exp(input_datas[0]) * output_grads[0]]
-def exp(*input)->Variable:
-    return Exp()(*input)[0]
+exp = single_out(Exp)
 
 class Add(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
         return [sum(input_datas)]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         return apply_each(input_datas,lambda i:output_grads[0])
-def add(*inputs)->Variable:
-    return Add()(*inputs)[0]
+add = single_out(Add)
+
 
 def product(*inputs):
     ret = 1
@@ -251,9 +249,8 @@ class Mul(Function):
                           lambda inpdat: 
                           product(*[data for data in input_datas if data != inpdat])
                           )
-def mul(*inputs)->Variable:
-    return Mul()(*inputs)[0]
-    
+mul = single_out(Mul)
+
 Variable.__mul__ = mul
 Variable.__add__ = add
 Variable.__rmul__ = mul
