@@ -259,13 +259,14 @@ class Mul(Function):
                           lambda inpdat: 
                           output_grads[0]*seq_product(*[data for data in input_datas if data != inpdat])
                           )
+mul = single_out(Mul)
 
 class Sub(Function):
     def forward(self, input_datas: List[Any]) -> List[Any]:
         return [seq_subtract(*input_datas)]
     def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
         return [-output_grads[0] for data in input_datas]
-sub:Variable = single_out(Sub)
+sub = single_out(Sub)
 
 Variable.__neg__ = neg
 Variable.__mul__ = mul
