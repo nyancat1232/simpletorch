@@ -173,6 +173,7 @@ class Function:
         output_grads = [output.grad for output in self.outputs]
 
         input_grad_result = self.backward(input_datas,output_grads)
+        assert isinstance(input_grad_result,list), "backward's return type must be a list"
         for input_var, res_grad in zip(self.inputs,input_grad_result):
             try:
                 input_var.grad = input_var.grad + res_grad
