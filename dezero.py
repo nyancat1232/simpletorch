@@ -228,12 +228,6 @@ class Exp(Function):
         return [np.exp(input_datas[0]) * output_grads[0]]
 exp = single_out(Exp)
 
-class Add(Function):
-    def forward(self,input_datas:List[Any])->List[Any]:
-        return [sum(input_datas)]
-    def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
-        return apply_each(input_datas,lambda i:output_grads[0])
-add = single_out(Add)
 
 class Neg(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
@@ -274,13 +268,6 @@ class Mul(Function):
                           output_grads[0]*seq_product(*[data for data in input_datas if data != inpdat])
                           )
 mul = single_out(Mul)
-
-class Sub(Function):
-    def forward(self, input_datas: List[Any]) -> List[Any]:
-        return [seq_subtract(*input_datas)]
-    def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
-        return [-output_grads[0] for data in input_datas]
-sub = single_out(Sub)
 
 Variable.__neg__ = neg
 Variable.__add__ = add
