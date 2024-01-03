@@ -237,13 +237,6 @@ class Neg(Function):
 neg = single_out(Neg)
 
 
-def seq_operate(operate_func,*inputs):
-    ret = inputs[0]
-    for v in inputs[1:]:
-        ret = operate_func(ret,v)
-    return ret
-seq_product = lambda *inputs:seq_operate(lambda x,y:x*y,*inputs)
-seq_subtract = lambda*inputs:seq_operate(lambda x,y:x-y,*inputs)
 
 class Add(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
@@ -263,10 +256,7 @@ class Mul(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
         return [ input_datas[0]*input_datas[1] ]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
-        return apply_each(input_datas,
-                          lambda inpdat: 
-                          output_grads[0]*seq_product(*[data for data in input_datas if data != inpdat])
-                          )
+        return [output_grads[0]*input_datas[1],output_grads[0]*input_datas[0]]
 mul = single_out(Mul)
 
 Variable.__neg__ = neg
