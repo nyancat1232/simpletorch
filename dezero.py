@@ -256,6 +256,8 @@ def mul(*inputs)->Variable:
     
 Variable.__mul__ = mul
 Variable.__add__ = add
+Variable.__rmul__ = mul
+Variable.__radd__ = add
 
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
