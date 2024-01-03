@@ -65,10 +65,12 @@ class Variable:
     data : np.ndarray
     grad : np.ndarray
     creator : Function
+    name : str
     generation : int
 
-    def __init__(self,data,creator:Function=None):
+    def __init__(self,data,creator:Function=None,name:str = None):
         self.data = init_ndarray(data)
+        self.name = name
         if creator is not None:
             self.creator = creator
             self.generation = creator.generation + 1
