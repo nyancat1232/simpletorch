@@ -131,13 +131,13 @@ class Function:
 
         self.inputs = apply_each(inputs,lambda data:init_variable(data))
         def check(c,type):
-            assert isinstance(c,type)
+            assert isinstance(c,type) , "each input must be a Variable"
         apply_each(self.inputs,lambda c:check(c,Variable))
 
         self.inputs = listify(self.inputs)
 
         output_result = self.forward([input.data for input in self.inputs])
-        assert isinstance(output_result,list)
+        assert isinstance(output_result,list), "output must be a list"
         
         if Config.enable_backprop:
             self.generation = max([input.generation for input in self.inputs])
