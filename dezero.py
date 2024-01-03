@@ -259,6 +259,14 @@ class Mul(Function):
         return [output_grads[0]*input_datas[1],output_grads[0]*input_datas[0]]
 mul = single_out(Mul)
 
+class Div(Function):
+    def forward(self, input_datas: List[Any]) -> List[Any]:
+        return [ input_datas[0]/input_datas[1] ]
+    def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
+        gy = output_grads[0]
+        return [gy/input_datas[1],gy*(-input_datas[0]/(input_datas[1]**2))]
+div = single_out(Div)
+
 Variable.__neg__ = neg
 Variable.__add__ = add
 Variable.__radd__ = add
