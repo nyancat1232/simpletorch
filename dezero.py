@@ -249,7 +249,7 @@ class Sub(Function):
     def forward(self, input_datas: List[Any]) -> List[Any]:
         return [input_datas[0]-input_datas[1]]
     def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
-        return [output_grads[0], output_grads[0]]
+        return [output_grads[0], -output_grads[0]]
 sub = single_out(Sub)
 
 class Mul(Function):
