@@ -251,9 +251,23 @@ def seq_operate(operate_func,*inputs):
 seq_product = lambda *inputs:seq_operate(lambda x,y:x*y,*inputs)
 seq_subtract = lambda*inputs:seq_operate(lambda x,y:x-y,*inputs)
 
+class Add(Function):
+    def forward(self,input_datas:List[Any])->List[Any]:
+        return [input_datas[0]+input_datas[1]]
+    def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
+        return apply_each(input_datas,lambda i:output_grads[0])
+add = single_out(Add)
+
+class Sub(Function):
+    def forward(self, input_datas: List[Any]) -> List[Any]:
+        return [input_datas[0]-input_datas[1]]
+    def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
+        return [-output_grads[0] for data in input_datas]
+sub = single_out(Sub)
+
 class Mul(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
-        return [ seq_product(*input_datas) ]
+        return [ input_datas[0]*input_datas[1] ]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         return apply_each(input_datas,
                           lambda inpdat: 
@@ -269,10 +283,10 @@ class Sub(Function):
 sub = single_out(Sub)
 
 Variable.__neg__ = neg
-Variable.__mul__ = mul
 Variable.__add__ = add
-Variable.__rmul__ = mul
 Variable.__radd__ = add
+Variable.__mul__ = mul
+Variable.__rmul__ = mul
 Variable.__sub__ = sub
 
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
