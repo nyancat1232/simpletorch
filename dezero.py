@@ -242,7 +242,7 @@ class Add(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
         return [input_datas[0]+input_datas[1]]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
-        return apply_each(input_datas,lambda i:output_grads[0])
+        return [output_grads[0],output_grads[0]]
 add = single_out(Add)
 
 class Sub(Function):
