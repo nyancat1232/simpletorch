@@ -257,7 +257,7 @@ class Mul(Function):
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         return apply_each(input_datas,
                           lambda inpdat: 
-                          seq_product(*[data for data in input_datas if data != inpdat])
+                          output_grads[0]*seq_product(*[data for data in input_datas if data != inpdat])
                           )
 
 class Sub(Function):
