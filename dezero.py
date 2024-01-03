@@ -68,6 +68,21 @@ class Variable:
     name : str
     generation : int
 
+    @property
+    def shape(self):
+        return self.data.shape
+    
+    @property
+    def size(self):
+        return self.data.size
+    
+    @property
+    def dtype(self):
+        return self.data.dtype
+    
+    def __len__(self):
+        return len(self.data)
+
     def __init__(self,data,creator:Function=None,name:str = None):
         self.data = init_ndarray(data)
         self.name = name
