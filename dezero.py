@@ -243,18 +243,20 @@ class Neg(Function):
 neg = single_out(Neg)
 
 
-def product(*inputs):
-    ret = 1
-    for v in inputs:
-        ret = ret*v
+def seq_operate(operate_func,*inputs):
+    ret = inputs[0]
+    for v in inputs[1:]:
+        ret = operate_func(ret,v)
     return ret
+seq_product = lambda *inputs:seq_operate(lambda x,y:x*y,*inputs)
+
 class Mul(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
-        return [ product(*input_datas) ]
+        return [ seq_product(*input_datas) ]
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         return apply_each(input_datas,
                           lambda inpdat: 
-                          product(*[data for data in input_datas if data != inpdat])
+                          seq_product(*[data for data in input_datas if data != inpdat])
                           )
 mul = single_out(Mul)
 
