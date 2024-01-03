@@ -110,6 +110,7 @@ class Variable:
 
         return ret_str
 
+
 class Config:
     enable_backprop = True
 
@@ -253,6 +254,9 @@ class Mul(Function):
 def mul(*inputs)->Variable:
     return Mul()(*inputs)[0]
     
+Variable.__mul__ = mul
+Variable.__add__ = add
+
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
     x1=x.data+eps
