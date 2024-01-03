@@ -242,7 +242,6 @@ class Neg(Function):
         return apply_each(input_datas,lambda i:output_grads[0])
 neg = single_out(Neg)
 
-Variable.__neg__ = neg
 
 def product(*inputs):
     ret = 1
@@ -259,6 +258,7 @@ class Mul(Function):
                           )
 mul = single_out(Mul)
 
+Variable.__neg__ = neg
 Variable.__mul__ = mul
 Variable.__add__ = add
 Variable.__rmul__ = mul
