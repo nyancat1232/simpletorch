@@ -250,7 +250,7 @@ class Sub(Function):
         return [input_datas[0]-input_datas[1]]
     def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
         return [output_grads[0], -output_grads[0]]
-sub = single_out(Sub)
+sub = lambda a,b:Sub()(a,b)[0]
 
 class Mul(Function):
     def forward(self,input_datas:List[Any])->List[Any]:
@@ -265,7 +265,7 @@ class Div(Function):
     def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
         gy = output_grads[0]
         return [gy/input_datas[1],gy*(-input_datas[0]/(input_datas[1]**2))]
-div = single_out(Div)
+div = lambda a,b:Div()(a,b)[0]
 
 Variable.__neg__ = neg
 Variable.__add__ = add
@@ -273,7 +273,9 @@ Variable.__radd__ = add
 Variable.__mul__ = mul
 Variable.__rmul__ = mul
 Variable.__sub__ = sub
+Variable.__rsub__ = lambda self,other:Sub()(other,self)[0]
 Variable.__truediv__ = div
+Variable.__rtruediv__ = lambda self,other:Div()(other,self)[0]
 
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
