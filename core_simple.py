@@ -213,7 +213,7 @@ class Function:
         raise NotImplementedError('You must implement backward')
 
     def to_graphviz_line(self):
-        func= f'{id(self)} [label="{None}", color=lightblue, style=filled, shape=box] \n'
+        func= f'{id(self)} [label="{self.__class__.__name__}", color=lightblue, style=filled, shape=box] \n'
         for input in self.inputs:
             func = func + f'{id(input)} [label="{input.name}", color=orange, style=filled] \n'
             func = func + f'{id(input)} -> {id(self)} \n'
