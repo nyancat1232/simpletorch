@@ -217,10 +217,6 @@ class Function:
         for input in self.inputs:
             func = func + f'{id(input)} [label="{input.name}", color=orange, style=filled] \n'
             func = func + f'{id(input)} -> {id(self)} \n'
-            try:
-                func = func + input.creator.to_graphviz_line()
-            except:
-                pass
         for output in self.outputs:
             func = func + f'{id(output)} [label="{output.name}", color=orange, style=filled] \n'
             func = func + f'{id(self)} -> {id(output)} \n'
