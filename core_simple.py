@@ -83,7 +83,7 @@ class Variable:
     def __len__(self):
         return len(self.data)
 
-    def __init__(self,data,creator:Function=None,name:str = None):
+    def __init__(self,data,name:str = None,creator:Function=None):
         self.data = init_ndarray(data)
         self.name = name
         if creator is not None:
