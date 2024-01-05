@@ -109,6 +109,14 @@ class Variable:
             pass
 
         return ret_str
+    
+    def to_graphviz_line(self):
+        return f'{id(self)} [label="{self.data}", color=orange, style=filled] \n'
+    def to_graphviz_line_recursive(self):
+        v = self.to_graphviz_line()
+        v = v+ self.creator.to_graphviz_line()
+        v = v+f'{id(self.creator)}->{id(self)}'
+        return v
 
 single_out = lambda cl: lambda *inputs:cl()(*inputs)[0]
 
@@ -202,6 +210,9 @@ class Function:
         raise NotImplementedError('You must implement forward')
     def backward(self,input_datas:List[Any],output_grads:List[Any])->List[Any]:
         raise NotImplementedError('You must implement backward')
+
+    def to_graphviz_line(self):
+        return f'{id(self)} [label="{None}", color=lightblue, style=filled, shape=box] \n'
     
     def __repr__(self):
         ret_str = f'generation:{self.generation}\t'
