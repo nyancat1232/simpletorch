@@ -267,6 +267,15 @@ class Div(Function):
         return [gy/input_datas[1],gy*(-input_datas[0]/(input_datas[1]**2))]
 div = lambda a,b:Div()(a,b)[0]
 
+class Pow(Function):
+    def forward(self, input_datas: List[Any]) -> List[Any]:
+        return [ input_datas[0] ** input_datas[1] ]
+    def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
+        gy = output_grads[0]
+        return [ gy* input_datas[1] * (input_datas[0] ** (input_datas[1] - 1)) ,
+                gy * (input_datas[0] ** input_datas[1]) * np.log(input_datas[0]) ]
+pow = lambda a,b:Pow()(a,b)[0]
+
 def setup_variable():
     Variable.__neg__ = neg
     Variable.__add__ = add
@@ -277,6 +286,7 @@ def setup_variable():
     Variable.__rsub__ = lambda self,other:Sub()(other,self)[0]
     Variable.__truediv__ = div
     Variable.__rtruediv__ = lambda self,other:Div()(other,self)[0]
+    Variable.__pow__ = pow
 
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
