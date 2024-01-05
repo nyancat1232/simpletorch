@@ -57,7 +57,7 @@ def init_ndarray(data)->np.ndarray:
 
 def init_variable(data,creator:Variable=None)->Variable:
     if not isinstance(data,Variable):
-        return Variable(data,creator)
+        return Variable(data,creator=creator)
     else:
         return data
     
