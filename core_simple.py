@@ -109,14 +109,15 @@ class Variable:
             pass
 
         return ret_str
-    
-    def to_graphviz_line(self):
-        return f'{id(self)} [label="{self.data}", color=orange, style=filled] \n'
-    def to_graphviz_line_recursive(self):
-        v = self.to_graphviz_line()
-        v = v+ self.creator.to_graphviz_line()
-        v = v+f'{id(self.creator)}->{id(self)}'
-        return v
+
+    def graphviz_from_end(self):
+        resstr = ''
+        if hasattr(self,'creator'):
+            all_order_func = self.creator.get_all_parent_variable()
+            for func in all_order_func:
+                resstr= resstr+func.to_graphviz_line()
+        return resstr
+
 
 single_out = lambda cl: lambda *inputs:cl()(*inputs)[0]
 
@@ -212,7 +213,19 @@ class Function:
         raise NotImplementedError('You must implement backward')
 
     def to_graphviz_line(self):
-        return f'{id(self)} [label="{None}", color=lightblue, style=filled, shape=box] \n'
+        func= f'{id(self)} [label="{None}", color=lightblue, style=filled, shape=box] \n'
+        for input in self.inputs:
+            func = func + f'{id(input)} [label="{input.name}", color=orange, style=filled] \n'
+            func = func + f'{id(input)} -> {id(self)} \n'
+            try:
+                func = func + input.creator.to_graphviz_line()
+            except:
+                pass
+        for output in self.outputs:
+            func = func + f'{id(output)} [label="{output.name}", color=orange, style=filled] \n'
+            func = func + f'{id(self)} -> {id(output)} \n'
+        
+        return func
     
     def __repr__(self):
         ret_str = f'generation:{self.generation}\t'
