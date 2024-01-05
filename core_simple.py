@@ -111,11 +111,12 @@ class Variable:
         return ret_str
 
     def graphviz_from_end(self):
-        resstr = ''
+        resstr = "digraph {\n"
         if hasattr(self,'creator'):
             all_order_func = self.creator.get_all_parent_variable()
             for func in all_order_func:
                 resstr= resstr+func.to_graphviz_line()
+        resstr = resstr + "}"
         return resstr
 
 
