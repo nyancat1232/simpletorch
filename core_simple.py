@@ -313,7 +313,7 @@ class Sin(Function):
     def forward(self, input_datas: List[Any]) -> List[Any]:
         return [ np.sin(input_datas[0] )]
     def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
-        return [ output_grads * np.cos(input_datas[0])]
+        return [ output_grads[0] * np.cos(input_datas[0])]
 sin = single_out(Sin)
 
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
