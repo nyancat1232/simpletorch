@@ -309,6 +309,13 @@ def setup_variable():
     Variable.__rtruediv__ = lambda self,other:Div()(other,self)[0]
     Variable.__pow__ = pow
 
+class Sin(Function):
+    def forward(self, input_datas: List[Any]) -> List[Any]:
+        return [ np.sin(input_datas[0] )]
+    def backward(self, input_datas: List[Any], output_grads: List[Any]) -> List[Any]:
+        return [ output_grads * np.cos(input_datas[0])]
+sin = single_out(Sin)
+
 def numerical_diff(f:Function,x:Variable,eps:float=1e-4):
     x0=x.data-eps
     x1=x.data+eps
