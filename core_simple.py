@@ -215,11 +215,18 @@ class Function:
 
     def to_graphviz_line(self):
         func= f'{id(self)} [label="{self.__class__.__name__}", color=lightblue, style=filled, shape=box] \n'
+
+        def name_or_val(node:Variable):
+            if node.name:
+                return node.name
+            else:
+                return node.data
+
         for input in self.inputs:
-            func = func + f'{id(input)} [label="{input.name}", color=orange, style=filled] \n'
+            func = func + f'{id(input)} [label="{name_or_val(input)}", color=orange, style=filled] \n'
             func = func + f'{id(input)} -> {id(self)} \n'
         for output in self.outputs:
-            func = func + f'{id(output)} [label="{output.name}", color=orange, style=filled] \n'
+            func = func + f'{id(output)} [label="{name_or_val(output)}", color=orange, style=filled] \n'
             func = func + f'{id(self)} -> {id(output)} \n'
         
         return func
