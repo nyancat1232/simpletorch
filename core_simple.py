@@ -214,7 +214,7 @@ class Function:
         raise NotImplementedError('You must implement backward')
 
     def to_graphviz_line(self):
-        func= f'{id(self)} [label="{self.__class__.__name__}", color=lightblue, style=filled, shape=box] \n'
+        func= f'{id(self)} [label="{self.__class__.__name__} {self.generation}", color=lightblue, style=filled, shape=box] \n'
 
         def name_or_val(node:Variable):
             if node.name:
